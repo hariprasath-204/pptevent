@@ -63,7 +63,7 @@ export default function LandingPage() {
         >
           {[
             { icon: <FaUserFriends className="text-3xl text-indigo-400" />, title: 'Team of 2', desc: 'Find a partner and collaborate' },
-            { icon: <FaFilePowerpoint className="text-3xl text-pink-400" />, title: 'PPT Format Only', desc: 'Submit standard .ppt or .pptx' },
+            { icon: <FaFilePowerpoint className="text-3xl text-pink-400" />, title: 'Cloud PPT Link', desc: 'Submit Google Drive or OneDrive link' },
             { icon: <FaChalkboardTeacher className="text-3xl text-cyan-400" />, title: 'Live Presentation', desc: 'Present directly to the judges' },
             { icon: <FaClock className="text-3xl text-purple-400" />, title: 'Time-Limited', desc: 'Strict time limits for each round' },
           ].map((feature, i) => (
