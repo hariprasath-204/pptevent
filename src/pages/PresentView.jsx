@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../firebase';
 import { FaCompress, FaExpand, FaArrowLeft, FaCheck, FaExternalLinkAlt } from 'react-icons/fa';
@@ -16,7 +17,13 @@ export default function PresentView() {
   const [timeLeft, setTimeLeft] = useState(timerLimitMinutes * 60);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [startTime] = useState(Date.now());
+  const [showHint, setShowHint] = useState(true);
   const containerRef = useRef(null);
+
+  useEffect(() => {
+    const hintTimer = setTimeout(() => setShowHint(false), 8000);
+    return () => clearTimeout(hintTimer);
+  }, []);
 
   useEffect(() => {
     if (!team) {
@@ -172,6 +179,23 @@ export default function PresentView() {
           allowFullScreen
         />
       </div>
+
+      {/* Keyboard Hint Overlay */}
+      <AnimatePresence>
+        {showHint && (
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 50 }}
+            className="absolute bottom-6 left-1/2 transform -translate-x-1/2 z-50 pointer-events-none"
+          >
+            <div className="bg-cyan-500/90 backdrop-blur-md text-slate-900 px-6 py-3 rounded-full font-bold shadow-2xl flex items-center gap-2">
+              <span className="text-xl">🖱️</span> 
+              <span>Click the slide once to enable Keyboard Arrows</span>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Bottom Control Overlay */}
       <div className="absolute bottom-6 right-6 z-50 pointer-events-auto">
