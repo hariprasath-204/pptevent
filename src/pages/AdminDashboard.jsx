@@ -5,6 +5,9 @@ import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FaDownload, FaPlay, FaSignOutAlt, FaSearch } from 'react-icons/fa';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
+import toast from 'react-hot-toast';
 
 export default function AdminDashboard() {
   const [teams, setTeams] = useState([]);
@@ -61,6 +64,161 @@ export default function AdminDashboard() {
     return `${m}m ${s}s`;
   };
 
+  const getAverages = (evaluations) => {
+    if (!evaluations) return { presentation: 0, technical: 0, design: 0, total: 0 };
+    const keys = Object.keys(evaluations);
+    if (keys.length === 0) return { presentation: 0, technical: 0, design: 0, total: 0 };
+    
+    let p = 0, t = 0, d = 0, tot = 0;
+    keys.forEach(k => {
+      p += evaluations[k].presentation || 0;
+      t += evaluations[k].technical || 0;
+      d += evaluations[k].design || 0;
+      tot += evaluations[k].total || 0;
+    });
+    
+    return {
+      presentation: (p / keys.length).toFixed(1),
+      technical: (t / keys.length).toFixed(1),
+      design: (d / keys.length).toFixed(1),
+      total: (tot / keys.length).toFixed(1)
+    };
+  };
+
+  const downloadScoreSheet = () => {
+    const doc = new jsPDF();
+    doc.text('PPT Presentation Event - Average Score Sheet', 14, 15);
+    
+    const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Technical (20)", "Design (10)", "Total Avg (50)"];
+    const tableRows = [];
+
+    const sortedTeams = [...teams].sort((a, b) => a.teamNumber - b.teamNumber);
+    sortedTeams.forEach(team => {
+      const avg = getAverages(team.evaluations);
+      const members = `${team.member1Name} (${team.member1Roll || 'N/A'})\n${team.member2Name} (${team.member2Roll || 'N/A'})`;
+      const rowData = [
+        team.teamNumber,
+        members,
+        team.title,
+        avg.presentation,
+        avg.technical,
+        avg.design,
+        avg.total
+      ];
+      tableRows.push(rowData);
+    });
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      theme: 'grid',
+      styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
+      headStyles: { fillColor: [14, 165, 233] },
+    });
+
+    doc.save('Average_ScoreSheet.pdf');
+    toast.success('Average ScoreSheet downloaded');
+  };
+
+  const downloadWinnerSheet = () => {
+    const teamsWithAvg = teams.map(t => ({ ...t, avgTotal: parseFloat(getAverages(t.evaluations).total) }));
+    const sortedTeams = teamsWithAvg.sort((a, b) => b.avgTotal - a.avgTotal);
+    const top3 = sortedTeams.slice(0, 3).filter(t => t.avgTotal > 0);
+
+    if (top3.length === 0) {
+      toast.error('No scores available to generate winners.');
+      return;
+    }
+
+    const doc = new jsPDF();
+    doc.text('PPT Presentation Event - Top 3 Winners (Based on Average)', 14, 15);
+    
+    const tableColumn = ["Rank", "Team No", "Members", "Roll Nos", "Topic", "Avg Total (50)"];
+    const tableRows = [];
+
+    top3.forEach((team, index) => {
+      const members = `${team.member1Name}\n${team.member2Name}`;
+      const rolls = `${team.member1Roll || 'N/A'}\n${team.member2Roll || 'N/A'}`;
+      const rowData = [
+        index + 1,
+        team.teamNumber,
+        members,
+        rolls,
+        team.title,
+        team.avgTotal.toFixed(1)
+      ];
+      tableRows.push(rowData);
+    });
+
+    doc.autoTable({
+      head: [tableColumn],
+      body: tableRows,
+      startY: 20,
+      theme: 'grid',
+      styles: { fontSize: 10, cellPadding: 4, valign: 'middle' },
+      headStyles: { fillColor: [168, 85, 247] },
+    });
+
+    doc.save('WinnerSheet_Top3_Avg.pdf');
+    toast.success('WinnerSheet downloaded');
+  };
+
+  const downloadIndividualStaffSheets = () => {
+    const staffMap = {};
+    teams.forEach(team => {
+        if (team.evaluations) {
+            Object.entries(team.evaluations).forEach(([uid, evalData]) => {
+                staffMap[uid] = evalData.staffEmail || uid;
+            });
+        }
+    });
+
+    if (Object.keys(staffMap).length === 0) {
+        toast.error('No staff evaluations found.');
+        return;
+    }
+
+    const doc = new jsPDF();
+    
+    Object.entries(staffMap).forEach(([uid, email], index) => {
+        if (index > 0) doc.addPage();
+        
+        doc.text(`Staff Evaluation Sheet - Evaluator: ${email}`, 14, 15);
+        
+        const tableColumn = ["Team No", "Members", "Topic", "Presentation", "Technical", "Design", "Total"];
+        const tableRows = [];
+        
+        const sortedTeams = [...teams].sort((a, b) => a.teamNumber - b.teamNumber);
+        sortedTeams.forEach(team => {
+            const ev = team.evaluations?.[uid];
+            if (!ev) return; // Only show teams evaluated by this staff member, or show all? Let's show all so it's a complete sheet. Wait, maybe show all.
+            const members = `${team.member1Name}\n${team.member2Name}`;
+            tableRows.push([
+                team.teamNumber,
+                members,
+                team.title,
+                ev.presentation ?? '-',
+                ev.technical ?? '-',
+                ev.design ?? '-',
+                ev.total ?? '-'
+            ]);
+        });
+
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 20,
+            theme: 'grid',
+            styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
+            headStyles: { fillColor: [79, 70, 229] }, // Indigo
+        });
+    });
+
+    doc.save('Individual_Staff_ScoreSheets.pdf');
+    toast.success('Individual sheets downloaded');
+  };
+
   return (
     <div className="min-h-screen bg-slate-900 text-white pb-12">
       {/* Navbar */}
@@ -82,8 +240,26 @@ export default function AdminDashboard() {
             </div>
 
             <button
+              onClick={downloadScoreSheet}
+              className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 transition-colors px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap"
+            >
+              📄 Avg ScoreSheet
+            </button>
+            <button
+              onClick={downloadWinnerSheet}
+              className="flex items-center gap-2 bg-purple-600 hover:bg-purple-500 transition-colors px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap"
+            >
+              🏆 WinnerSheet
+            </button>
+            <button
+              onClick={downloadIndividualStaffSheets}
+              className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-500 transition-colors px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap"
+            >
+              👤 Staff Sheets
+            </button>
+            <button
               onClick={handleLogout}
-              className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors bg-red-400/10 px-4 py-2 rounded-xl"
+              className="flex items-center gap-2 text-red-400 hover:text-red-300 transition-colors bg-red-400/10 px-3 py-2 rounded-xl whitespace-nowrap"
             >
               <FaSignOutAlt />
               <span>Logout</span>

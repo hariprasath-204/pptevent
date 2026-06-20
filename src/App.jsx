@@ -4,6 +4,8 @@ import LandingPage from './pages/LandingPage';
 import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import PresentView from './pages/PresentView';
+import StaffLogin from './pages/StaffLogin';
+import StaffDashboard from './pages/StaffDashboard';
 import { useEffect, useState } from 'react';
 import { auth } from './firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -46,6 +48,15 @@ function App() {
           element={
             <ProtectedRoute>
               <PresentView />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="/staff/login" element={<StaffLogin />} />
+        <Route 
+          path="/staff/dashboard" 
+          element={
+            <ProtectedRoute>
+              <StaffDashboard />
             </ProtectedRoute>
           } 
         />
