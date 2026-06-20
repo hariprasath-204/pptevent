@@ -77,6 +77,29 @@ export default function LandingPage() {
           ))}
         </motion.div>
 
+        {/* Demo Video Section */}
+        <motion.div
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="mt-24 w-full max-w-4xl mx-auto"
+        >
+          <div className="text-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">How to Register & Share PPT</h2>
+            <p className="text-slate-400">Watch this quick demo on how to upload your presentation to Google Drive, generate a public link, and register for the event.</p>
+          </div>
+          <div className="glass-card p-2 md:p-4 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl bg-slate-900/50">
+            <video 
+              controls 
+              className="w-full rounded-xl"
+              preload="metadata"
+            >
+              <source src="/demo-video.mp4" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+        </motion.div>
+
         <footer className="mt-24 text-center text-slate-500 text-sm">
           <p>Ayya Nadar Janaki Ammal College &copy; 2026</p>
           <p className="mt-1">Soft Tech Association — Department of Computer Applications</p>
