@@ -88,11 +88,13 @@ export default function LandingPage() {
             <h2 className="text-2xl md:text-3xl font-bold text-white mb-4">How to Register & Share PPT</h2>
             <p className="text-slate-400">Watch this quick demo on how to upload your presentation to Google Drive, generate a public link, and register for the event.</p>
           </div>
-          <div className="glass-card p-2 md:p-4 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl bg-slate-900/50">
+          <div className="glass-card p-2 md:p-4 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl bg-slate-900/50 relative z-20">
             <video 
               controls 
+              playsInline
+              webkit-playsinline="true"
               className="w-full rounded-xl"
-              preload="metadata"
+              preload="auto"
             >
               <source src="/demo-video.mp4" type="video/mp4" />
               Your browser does not support the video tag.
