@@ -23,15 +23,15 @@ export default function StaffDashboard() {
       const user = auth.currentUser;
       const teamsData = snapshot.docs.map(doc => {
         const data = doc.data();
-        const myEval = data.evaluations?.[user?.uid] || { presentation: '', technical: '', design: '', total: 0 };
+        const myEval = data.evaluations?.[user?.uid] || { presentation: '', communication: '', concept: '', total: 0 };
         return {
           ...data,
           id: doc.id,
           evaluations: data.evaluations || {},
           marks: { 
             presentation: myEval.presentation, 
-            technical: myEval.technical, 
-            design: myEval.design 
+            communication: myEval.communication, 
+            concept: myEval.concept 
           },
           totalMark: myEval.total || 0
         };
@@ -62,16 +62,16 @@ export default function StaffDashboard() {
     
     // Validate maximums
     if (field === 'presentation' && numValue > 20) numValue = 20;
-    if (field === 'technical' && numValue > 20) numValue = 20;
-    if (field === 'design' && numValue > 10) numValue = 10;
+    if (field === 'communication' && numValue > 20) numValue = 20;
+    if (field === 'concept' && numValue > 10) numValue = 10;
     if (numValue !== '' && numValue < 0) numValue = 0;
 
     setTeams(prevTeams => prevTeams.map(team => {
       if (team.id === teamId) {
         const updatedMarks = { ...team.marks, [field]: numValue };
         const p = updatedMarks.presentation === '' ? 0 : updatedMarks.presentation;
-        const t = updatedMarks.technical === '' ? 0 : updatedMarks.technical;
-        const d = updatedMarks.design === '' ? 0 : updatedMarks.design;
+        const t = updatedMarks.communication === '' ? 0 : updatedMarks.communication;
+        const d = updatedMarks.concept === '' ? 0 : updatedMarks.concept;
         const total = p + t + d;
 
         return { ...team, marks: updatedMarks, totalMark: total };
@@ -93,8 +93,8 @@ export default function StaffDashboard() {
         [`evaluations.${user.uid}`]: {
           staffEmail: user.email || 'staff',
           presentation: team.marks.presentation,
-          technical: team.marks.technical,
-          design: team.marks.design,
+          communication: team.marks.communication,
+          concept: team.marks.concept,
           total: team.totalMark
         }
       });
@@ -132,8 +132,8 @@ export default function StaffDashboard() {
                   <th className="p-4 font-semibold text-cyan-400">Team No</th>
                   <th className="p-4 font-semibold text-cyan-400">Members & Topic</th>
                   <th className="p-4 font-semibold text-indigo-400 text-center">Presentation (20)</th>
-                  <th className="p-4 font-semibold text-indigo-400 text-center">Technical (20)</th>
-                  <th className="p-4 font-semibold text-indigo-400 text-center">Design (10)</th>
+                  <th className="p-4 font-semibold text-indigo-400 text-center">Communication (20)</th>
+                  <th className="p-4 font-semibold text-indigo-400 text-center">Concept (10)</th>
                   <th className="p-4 font-semibold text-pink-400 text-center">Total (50)</th>
                   <th className="p-4 font-semibold text-slate-400 text-center">Action</th>
                 </tr>
@@ -161,8 +161,8 @@ export default function StaffDashboard() {
                         type="number" 
                         min="0" max="20"
                         className="w-16 p-2 bg-slate-900 border border-slate-700 rounded text-center focus:border-indigo-500 focus:outline-none"
-                        value={team.marks?.technical ?? ''}
-                        onChange={(e) => handleMarkChange(team.id, 'technical', e.target.value)}
+                        value={team.marks?.communication ?? ''}
+                        onChange={(e) => handleMarkChange(team.id, 'communication', e.target.value)}
                       />
                     </td>
                     <td className="p-4 text-center">
@@ -170,8 +170,8 @@ export default function StaffDashboard() {
                         type="number" 
                         min="0" max="10"
                         className="w-16 p-2 bg-slate-900 border border-slate-700 rounded text-center focus:border-indigo-500 focus:outline-none"
-                        value={team.marks?.design ?? ''}
-                        onChange={(e) => handleMarkChange(team.id, 'design', e.target.value)}
+                        value={team.marks?.concept ?? ''}
+                        onChange={(e) => handleMarkChange(team.id, 'concept', e.target.value)}
                       />
                     </td>
                     <td className="p-4 text-center">

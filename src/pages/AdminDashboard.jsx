@@ -65,22 +65,22 @@ export default function AdminDashboard() {
   };
 
   const getAverages = (evaluations) => {
-    if (!evaluations) return { presentation: 0, technical: 0, design: 0, total: 0 };
+    if (!evaluations) return { presentation: 0, communication: 0, concept: 0, total: 0 };
     const keys = Object.keys(evaluations);
-    if (keys.length === 0) return { presentation: 0, technical: 0, design: 0, total: 0 };
+    if (keys.length === 0) return { presentation: 0, communication: 0, concept: 0, total: 0 };
     
     let p = 0, t = 0, d = 0, tot = 0;
     keys.forEach(k => {
       p += evaluations[k].presentation || 0;
-      t += evaluations[k].technical || 0;
-      d += evaluations[k].design || 0;
+      t += evaluations[k].communication || 0;
+      d += evaluations[k].concept || 0;
       tot += evaluations[k].total || 0;
     });
     
     return {
       presentation: (p / keys.length).toFixed(1),
-      technical: (t / keys.length).toFixed(1),
-      design: (d / keys.length).toFixed(1),
+      communication: (t / keys.length).toFixed(1),
+      concept: (d / keys.length).toFixed(1),
       total: (tot / keys.length).toFixed(1)
     };
   };
@@ -111,9 +111,9 @@ export default function AdminDashboard() {
 
   const downloadScoreSheet = () => {
     const doc = new jsPDF();
-    addHeader(doc, 'Average Score Sheet');
+    addHeader(doc, 'Complete Score Sheet');
     
-    const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Technical (20)", "Design (10)", "Total Avg (50)"];
+    const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
     const tableRows = [];
 
     const sortedTeams = [...teams].sort((a, b) => a.teamNumber - b.teamNumber);
@@ -125,8 +125,8 @@ export default function AdminDashboard() {
         members,
         team.title,
         avg.presentation,
-        avg.technical,
-        avg.design,
+        avg.communication,
+        avg.concept,
         avg.total
       ];
       tableRows.push(rowData);
@@ -147,8 +147,9 @@ export default function AdminDashboard() {
     doc.setTextColor(0, 0, 0);
     doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
 
-    doc.save('Average_ScoreSheet.pdf');
-    toast.success('Average ScoreSheet downloaded');
+    doc.save('Complete_ScoreSheet.pdf');
+    toast.success('ScoreSheet downloaded');
+  };
   };
 
   const downloadWinnerSheet = () => {
@@ -162,9 +163,9 @@ export default function AdminDashboard() {
     }
 
     const doc = new jsPDF();
-    addHeader(doc, 'Top 3 Winners (Based on Average)');
+    addHeader(doc, 'Top 3 Winners');
     
-    const tableColumn = ["Rank", "Team No", "Members", "Roll Nos", "Topic", "Avg Total (50)"];
+    const tableColumn = ["Rank", "Team No", "Members", "Roll Nos", "Topic", "Total (50)"];
     const tableRows = [];
 
     top3.forEach((team, index) => {
@@ -196,7 +197,7 @@ export default function AdminDashboard() {
     doc.setTextColor(0, 0, 0);
     doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
 
-    doc.save('WinnerSheet_Top3_Avg.pdf');
+    doc.save('WinnerSheet_Top3.pdf');
     toast.success('WinnerSheet downloaded');
   };
 
@@ -222,7 +223,7 @@ export default function AdminDashboard() {
         
         addHeader(doc, `Staff Evaluation Sheet - Evaluator: ${email}`);
         
-        const tableColumn = ["Team No", "Members", "Topic", "Presentation", "Technical", "Design", "Total"];
+        const tableColumn = ["Team No", "Members", "Topic", "Presentation", "Communication", "Concept", "Total"];
         const tableRows = [];
         
         const sortedTeams = [...teams].sort((a, b) => a.teamNumber - b.teamNumber);
@@ -235,8 +236,8 @@ export default function AdminDashboard() {
                 members,
                 team.title,
                 ev.presentation ?? '-',
-                ev.technical ?? '-',
-                ev.design ?? '-',
+                ev.communication ?? '-',
+                ev.concept ?? '-',
                 ev.total ?? '-'
             ]);
         });
@@ -285,7 +286,7 @@ export default function AdminDashboard() {
               onClick={downloadScoreSheet}
               className="flex items-center gap-2 bg-cyan-600 hover:bg-cyan-500 transition-colors px-3 py-2 rounded-xl text-sm font-semibold whitespace-nowrap"
             >
-              📄 Avg ScoreSheet
+              📄 ScoreSheet
             </button>
             <button
               onClick={downloadWinnerSheet}
