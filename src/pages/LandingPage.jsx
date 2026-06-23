@@ -62,7 +62,7 @@ export default function LandingPage() {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-24 w-full max-w-6xl"
         >
           {[
-            { icon: <FaUserFriends className="text-3xl text-indigo-400" />, title: 'Team of 2', desc: 'Find a partner and collaborate' },
+            { icon: <FaUserFriends className="text-3xl text-indigo-400" />, title: 'Individual Participant', desc: 'Present your own ideas solo' },
             { icon: <FaFilePowerpoint className="text-3xl text-pink-400" />, title: 'Cloud PPT Link', desc: 'Submit Google Drive or OneDrive link' },
             { icon: <FaChalkboardTeacher className="text-3xl text-cyan-400" />, title: 'Live Presentation', desc: 'Present directly to the judges' },
             { icon: <FaClock className="text-3xl text-purple-400" />, title: 'Time-Limited', desc: 'Strict time limits for each round' },

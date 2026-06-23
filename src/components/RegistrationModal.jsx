@@ -9,9 +9,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     member1Name: '',
     member1Roll: '',
-    member2Name: '',
-    member2Roll: '',
-    title: '',
+    title: 'how can use AI in Tech knoelege human vs NOn Tech knowlege human',
     pptUrl: '',
   });
   const [errors, setErrors] = useState({});
@@ -20,7 +18,6 @@ export default function RegistrationModal({ onClose, onSuccess }) {
   const validate = () => {
     const newErrors = {};
     if (!formData.member1Name.trim()) newErrors.member1Name = 'Required';
-    if (!formData.member2Name.trim()) newErrors.member2Name = 'Required';
     if (!formData.title.trim()) newErrors.title = 'Required';
     if (!formData.pptUrl.trim()) {
       newErrors.pptUrl = 'Required';
@@ -60,8 +57,6 @@ export default function RegistrationModal({ onClose, onSuccess }) {
           teamNumber: newTeamNumber,
           member1Name: formData.member1Name.trim(),
           member1Roll: formData.member1Roll.trim() || null,
-          member2Name: formData.member2Name.trim(),
-          member2Roll: formData.member2Roll.trim() || null,
           title: formData.title.trim(),
           pptFileURL: formData.pptUrl.trim(),
           status: 'registered',
@@ -108,10 +103,10 @@ export default function RegistrationModal({ onClose, onSuccess }) {
           <p className="text-slate-400 mb-8">Fill in the details below to secure your spot.</p>
 
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Member 1 */}
+            <div className="grid grid-cols-1 gap-6">
+              {/* Member */}
               <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-cyan-400 border-b border-slate-800 pb-2">Member 1</h3>
+                <h3 className="text-lg font-semibold text-cyan-400 border-b border-slate-800 pb-2">Participant Details</h3>
                 <div>
                   <label className="block text-sm text-slate-400 mb-1">Name *</label>
                   <input
@@ -134,32 +129,6 @@ export default function RegistrationModal({ onClose, onSuccess }) {
                   />
                 </div>
               </div>
-
-              {/* Member 2 */}
-              <div className="space-y-4">
-                <h3 className="text-lg font-semibold text-indigo-400 border-b border-slate-800 pb-2">Member 2</h3>
-                <div>
-                  <label className="block text-sm text-slate-400 mb-1">Name *</label>
-                  <input
-                    type="text"
-                    className="input-field"
-                    value={formData.member2Name}
-                    onChange={(e) => setFormData({...formData, member2Name: e.target.value})}
-                    disabled={isSubmitting}
-                  />
-                  {errors.member2Name && <p className="text-red-400 text-xs mt-1">{errors.member2Name}</p>}
-                </div>
-                <div>
-                  <label className="block text-sm text-slate-400 mb-1">Roll Number (Optional)</label>
-                  <input
-                    type="text"
-                    className="input-field"
-                    value={formData.member2Roll}
-                    onChange={(e) => setFormData({...formData, member2Roll: e.target.value})}
-                    disabled={isSubmitting}
-                  />
-                </div>
-              </div>
             </div>
 
             {/* Presentation Details */}
@@ -169,10 +138,10 @@ export default function RegistrationModal({ onClose, onSuccess }) {
                 <label className="block text-sm text-slate-400 mb-1">Presentation Title *</label>
                 <input
                   type="text"
-                  className="input-field"
+                  className="input-field cursor-not-allowed opacity-70"
                   value={formData.title}
-                  onChange={(e) => setFormData({...formData, title: e.target.value})}
-                  disabled={isSubmitting}
+                  readOnly
+                  disabled
                 />
                 {errors.title && <p className="text-red-400 text-xs mt-1">{errors.title}</p>}
               </div>
