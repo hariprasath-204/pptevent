@@ -119,7 +119,7 @@ export default function AdminDashboard() {
     doc.text('DEPARTMENT OF COMPUTER APPLICATIONS', pageWidth / 2, 21, { align: 'center' });
 
     // Line 3: College Name
-    doc.setFontSize(16);
+    doc.setFontSize(14);
     doc.text('AYYA NADAR JANAKI AMMAL COLLEGE', pageWidth / 2, 28, { align: 'center' });
 
     // Accreditations (Smaller text)
@@ -137,14 +137,18 @@ export default function AdminDashboard() {
     doc.setFont("helvetica", "bold");
     doc.text('SIVAKASI - 626 124.', pageWidth / 2, 46, { align: 'center' });
 
+    // Horizontal Line separator
+    doc.setLineWidth(0.5);
+    doc.line(14, 50, pageWidth - 14, 50);
+
     // Event Name
     doc.setFontSize(18);
-    doc.text('PPT Presentation Event', pageWidth / 2, 54, { align: 'center' });
+    doc.text('PPT Presentation Event', pageWidth / 2, 57, { align: 'center' });
 
     // Document Title (Optional)
     if (title) {
       doc.setFontSize(14);
-      doc.text(title, pageWidth / 2, 61, { align: 'center' });
+      doc.text(title, pageWidth / 2, 65, { align: 'center' });
     }
   };
 
@@ -174,13 +178,13 @@ export default function AdminDashboard() {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 65,
+      startY: 72,
       theme: 'grid',
       styles: { fontSize: 9, cellPadding: 3, valign: 'middle', textColor: [0, 0, 0] },
       headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
     });
 
-    const finalY = doc.lastAutoTable.finalY || 65;
+    const finalY = doc.lastAutoTable.finalY || 72;
     const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
@@ -223,13 +227,13 @@ export default function AdminDashboard() {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 68,
+      startY: 72,
       theme: 'grid',
       styles: { fontSize: 10, cellPadding: 4, valign: 'middle', textColor: [0, 0, 0] },
       headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
     });
 
-    const finalY = doc.lastAutoTable.finalY || 68;
+    const finalY = doc.lastAutoTable.finalY || 72;
     const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
@@ -285,13 +289,13 @@ export default function AdminDashboard() {
       autoTable(doc, {
         head: [tableColumn],
         body: tableRows,
-        startY: 68,
+        startY: 72,
         theme: 'grid',
         styles: { fontSize: 9, cellPadding: 3, valign: 'middle', textColor: [0, 0, 0] },
         headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
       });
 
-      const finalY = doc.lastAutoTable.finalY || 68;
+      const finalY = doc.lastAutoTable.finalY || 72;
       const pageWidth = doc.internal.pageSize.getWidth();
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
