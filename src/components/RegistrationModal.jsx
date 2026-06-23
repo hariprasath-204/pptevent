@@ -9,7 +9,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     member1Name: '',
     member1Roll: '',
-    title: 'how can use AI in Tech knoelege human vs NOn Tech knowlege human',
+    title: 'How AI technology used comupter known people or computer unknown people',
     pptUrl: '',
   });
   const [errors, setErrors] = useState({});
