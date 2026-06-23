@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,8 @@ export default function AdminDashboard() {
 
   const [activeTab, setActiveTab] = useState('teams');
 
+  const [usersInfo, setUsersInfo] = useState({});
+
   useEffect(() => {
     const q = query(collection(db, 'teams'), orderBy('teamNumber', 'asc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -29,8 +31,23 @@ export default function AdminDashboard() {
       setTeams(teamsData);
     });
 
+    fetchUsersInfo();
+
     return () => unsubscribe();
   }, []);
+
+  const fetchUsersInfo = async () => {
+    try {
+      const snap = await getDocs(collection(db, 'users'));
+      const uMap = {};
+      snap.forEach(doc => {
+        uMap[doc.id] = doc.data();
+      });
+      setUsersInfo(uMap);
+    } catch (e) {
+      console.error(e);
+    }
+  };
 
   const handleTimerChange = (e) => {
     const val = parseInt(e.target.value) || 1;
@@ -188,6 +205,21 @@ export default function AdminDashboard() {
     const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
+
+    const staffUIDs = new Set();
+    teams.forEach(t => {
+       if (t.evaluations) Object.keys(t.evaluations).forEach(uid => staffUIDs.add(uid));
+    });
+    
+    let currentX = 14;
+    Array.from(staffUIDs).forEach(uid => {
+      const sig = usersInfo[uid]?.signature;
+      if (sig) {
+        doc.addImage(sig, 'PNG', currentX, finalY + 10, 30, 15);
+        currentX += 40;
+      }
+    });
+
     doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
 
     doc.save('Complete_ScoreSheet.pdf');
@@ -237,6 +269,21 @@ export default function AdminDashboard() {
     const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
+
+    const staffUIDs = new Set();
+    teams.forEach(t => {
+       if (t.evaluations) Object.keys(t.evaluations).forEach(uid => staffUIDs.add(uid));
+    });
+    
+    let currentX = 14;
+    Array.from(staffUIDs).forEach(uid => {
+      const sig = usersInfo[uid]?.signature;
+      if (sig) {
+        doc.addImage(sig, 'PNG', currentX, finalY + 10, 30, 15);
+        currentX += 40;
+      }
+    });
+
     doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
 
     doc.save('WinnerSheet_Top3.pdf');
@@ -299,6 +346,12 @@ export default function AdminDashboard() {
       const pageWidth = doc.internal.pageSize.getWidth();
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
+
+      const sig = usersInfo[uid]?.signature;
+      if (sig) {
+        doc.addImage(sig, 'PNG', pageWidth - 44, finalY + 10, 30, 15);
+      }
+
       doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
     }
 

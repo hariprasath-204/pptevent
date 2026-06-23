@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { db } from '../firebase';
-import { collection, query, getDocs, doc, updateDoc } from 'firebase/firestore';
+import { collection, query, getDocs, doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
@@ -10,11 +10,30 @@ import { motion } from 'framer-motion';
 export default function StaffDashboard() {
   const [teams, setTeams] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isFinished, setIsFinished] = useState(false);
+  const [signatureUploading, setSignatureUploading] = useState(false);
+  const [signature, setSignature] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchTeams();
+    fetchSignature();
   }, []);
+
+  const fetchSignature = async () => {
+    try {
+      const user = auth.currentUser;
+      if (user) {
+        const userRef = doc(db, 'users', user.uid);
+        const snap = await getDoc(userRef);
+        if (snap.exists() && snap.data().signature) {
+          setSignature(snap.data().signature);
+        }
+      }
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   const fetchTeams = async () => {
     try {
@@ -103,6 +122,35 @@ export default function StaffDashboard() {
       console.error(error);
       toast.error('Failed to save marks');
     }
+  };
+
+  const handleSignatureUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Check file size (limit to 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast.error('File too large. Please upload an image under 2MB.');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const base64 = event.target.result;
+      setSignatureUploading(true);
+      try {
+        const userRef = doc(db, 'users', auth.currentUser.uid);
+        await setDoc(userRef, { signature: base64 }, { merge: true });
+        setSignature(base64);
+        toast.success('Signature uploaded successfully!');
+      } catch (err) {
+        console.error(err);
+        toast.error('Failed to upload signature');
+      } finally {
+        setSignatureUploading(false);
+      }
+    };
+    reader.readAsDataURL(file);
   };
 
   if (loading) {
@@ -198,6 +246,51 @@ export default function StaffDashboard() {
             </table>
           </div>
         </div>
+
+        {!isFinished ? (
+          <div className="mt-8 flex justify-end">
+            <button 
+              onClick={() => {
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                setIsFinished(true);
+              }} 
+              className="px-8 py-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white rounded-xl font-bold shadow-lg shadow-pink-500/30 transition-all transform hover:-translate-y-1"
+            >
+              Finish Evaluation
+            </button>
+          </div>
+        ) : (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            className="mt-8 glass-card p-8 rounded-2xl text-center border border-pink-500/30"
+          >
+            <h2 className="text-3xl font-bold text-pink-400 mb-4">Thank You!</h2>
+            <p className="text-slate-300 mb-8 max-w-lg mx-auto">
+              Thank you for your valuable time and effort in evaluating the teams. Your expertise is greatly appreciated.
+            </p>
+            
+            <div className="bg-slate-800/50 p-6 rounded-xl inline-block max-w-md w-full">
+              <h3 className="text-xl font-semibold text-cyan-400 mb-4">Upload Your Signature</h3>
+              <p className="text-sm text-slate-400 mb-6">
+                Upload a clear photo of your signature (PNG or JPG) to be automatically added to the final score sheets.
+              </p>
+              
+              {signature ? (
+                <div className="mb-6">
+                   <img src={signature} alt="Signature" className="h-20 mx-auto bg-white p-2 rounded-lg object-contain" />
+                   <p className="text-green-400 mt-2 text-sm font-semibold">Signature saved successfully!</p>
+                </div>
+              ) : null}
+
+              <label className="relative cursor-pointer inline-flex justify-center items-center gap-2 w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors font-semibold text-white">
+                <span>{signatureUploading ? 'Uploading...' : (signature ? 'Update Signature' : 'Choose File')}</span>
+                <input type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleSignatureUpload} disabled={signatureUploading} />
+              </label>
+            </div>
+          </motion.div>
+        )}
+
       </div>
     </div>
   );
