@@ -85,9 +85,33 @@ export default function AdminDashboard() {
     };
   };
 
+  const addHeader = (doc, title) => {
+    const pageWidth = doc.internal.pageSize.getWidth();
+    
+    // College Name
+    doc.setFontSize(16);
+    doc.setTextColor(14, 165, 233); // cyan
+    doc.text('Ayya Nadar Janaki Ammal College, Sivakasi', pageWidth / 2, 15, { align: 'center' });
+    
+    // Department Name
+    doc.setFontSize(11);
+    doc.setTextColor(100, 116, 139); // slate
+    doc.text('Soft Tech Association — Department of Computer Applications', pageWidth / 2, 22, { align: 'center' });
+    
+    // Event Name
+    doc.setFontSize(22);
+    doc.setTextColor(168, 85, 247); // purple
+    doc.text('PPT Presentation Event', pageWidth / 2, 32, { align: 'center' });
+    
+    // Document Title
+    doc.setFontSize(14);
+    doc.setTextColor(0, 0, 0); // black
+    doc.text(title, pageWidth / 2, 42, { align: 'center' });
+  };
+
   const downloadScoreSheet = () => {
     const doc = new jsPDF();
-    doc.text('PPT Presentation Event - Average Score Sheet', 14, 15);
+    addHeader(doc, 'Average Score Sheet');
     
     const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Technical (20)", "Design (10)", "Total Avg (50)"];
     const tableRows = [];
@@ -111,7 +135,7 @@ export default function AdminDashboard() {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 20,
+      startY: 50,
       theme: 'grid',
       styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
       headStyles: { fillColor: [14, 165, 233] },
@@ -132,7 +156,7 @@ export default function AdminDashboard() {
     }
 
     const doc = new jsPDF();
-    doc.text('PPT Presentation Event - Top 3 Winners (Based on Average)', 14, 15);
+    addHeader(doc, 'Top 3 Winners (Based on Average)');
     
     const tableColumn = ["Rank", "Team No", "Members", "Roll Nos", "Topic", "Avg Total (50)"];
     const tableRows = [];
@@ -154,7 +178,7 @@ export default function AdminDashboard() {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 20,
+      startY: 50,
       theme: 'grid',
       styles: { fontSize: 10, cellPadding: 4, valign: 'middle' },
       headStyles: { fillColor: [168, 85, 247] },
@@ -184,7 +208,7 @@ export default function AdminDashboard() {
     Object.entries(staffMap).forEach(([uid, email], index) => {
         if (index > 0) doc.addPage();
         
-        doc.text(`Staff Evaluation Sheet - Evaluator: ${email}`, 14, 15);
+        addHeader(doc, `Staff Evaluation Sheet - Evaluator: ${email}`);
         
         const tableColumn = ["Team No", "Members", "Topic", "Presentation", "Technical", "Design", "Total"];
         const tableRows = [];
@@ -208,7 +232,7 @@ export default function AdminDashboard() {
         autoTable(doc, {
             head: [tableColumn],
             body: tableRows,
-            startY: 20,
+            startY: 50,
             theme: 'grid',
             styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
             headStyles: { fillColor: [79, 70, 229] }, // Indigo
