@@ -107,48 +107,50 @@ export default function AdminDashboard() {
       doc.addImage(deptLogo, 'PNG', pageWidth - 37, 12, 22, 22);
     }
 
-    doc.setFontSize(16);
-    doc.text('SOFTECH \nDEPARTMENT OF COMPUTER APPLICATIONS', pageWidth / 2, 40, { align: 'center' });
+    doc.setTextColor(0, 0, 0); // Black and White theme
 
-    // College Name
+    // Line 1
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(14, 165, 233); // cyan
-    doc.text('AYYA NADAR JANAKI AMMAL COLLEGE', pageWidth / 2, 15, { align: 'center' });
+    doc.text('SOFTECH', pageWidth / 2, 15, { align: 'center' });
+
+    // Line 2
+    doc.setFontSize(14);
+    doc.text('DEPARTMENT OF COMPUTER APPLICATIONS', pageWidth / 2, 21, { align: 'center' });
+
+    // Line 3: College Name
+    doc.setFontSize(16);
+    doc.text('AYYA NADAR JANAKI AMMAL COLLEGE', pageWidth / 2, 28, { align: 'center' });
 
     // Accreditations (Smaller text)
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    doc.setTextColor(100, 116, 139); // slate
     const accText1 = "(Autonomous, Re-accredited with 'A+' Grade by NAAC (4th Cycle with CGPA of 3.48 out of 4), College of";
     const accText2 = "Excellence and Mentor institution by UGC, STAR College by DBT, Ranked 63rd at National Level in NIRF 2024";
     const accText3 = "and DST-FIST (2023) Supported & An ISO 9001:2015 Certified Institution)";
-    doc.text(accText1, pageWidth / 2, 20, { align: 'center' });
-    doc.text(accText2, pageWidth / 2, 24, { align: 'center' });
-    doc.text(accText3, pageWidth / 2, 28, { align: 'center' });
+    doc.text(accText1, pageWidth / 2, 33, { align: 'center' });
+    doc.text(accText2, pageWidth / 2, 37, { align: 'center' });
+    doc.text(accText3, pageWidth / 2, 41, { align: 'center' });
 
     // Location
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
-    doc.setTextColor(100, 116, 139); // slate
-    doc.text('SIVAKASI - 626 124.', pageWidth / 2, 33, { align: 'center' });
-
-    // Department Name
+    doc.text('SIVAKASI - 626 124.', pageWidth / 2, 46, { align: 'center' });
 
     // Event Name
     doc.setFontSize(18);
-    doc.setTextColor(168, 85, 247); // purple
-    doc.text('PPT Presentation Event', pageWidth / 2, 48, { align: 'center' });
+    doc.text('PPT Presentation Event', pageWidth / 2, 54, { align: 'center' });
 
-    // Document Title
-    doc.setFontSize(14);
-    doc.setTextColor(0, 0, 0); // black
-    doc.text(title, pageWidth / 2, 56, { align: 'center' });
+    // Document Title (Optional)
+    if (title) {
+      doc.setFontSize(14);
+      doc.text(title, pageWidth / 2, 61, { align: 'center' });
+    }
   };
 
   const downloadScoreSheet = async () => {
     const doc = new jsPDF();
-    await addHeader(doc, 'Complete Score Sheet');
+    await addHeader(doc, ''); // Remove title completely
 
     const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
     const tableRows = [];
@@ -174,8 +176,8 @@ export default function AdminDashboard() {
       body: tableRows,
       startY: 65,
       theme: 'grid',
-      styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
-      headStyles: { fillColor: [14, 165, 233] },
+      styles: { fontSize: 9, cellPadding: 3, valign: 'middle', textColor: [0, 0, 0] },
+      headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
     });
 
     const finalY = doc.lastAutoTable.finalY || 65;
@@ -221,13 +223,13 @@ export default function AdminDashboard() {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 65,
+      startY: 68,
       theme: 'grid',
-      styles: { fontSize: 10, cellPadding: 4, valign: 'middle' },
-      headStyles: { fillColor: [168, 85, 247] },
+      styles: { fontSize: 10, cellPadding: 4, valign: 'middle', textColor: [0, 0, 0] },
+      headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
     });
 
-    const finalY = doc.lastAutoTable.finalY || 65;
+    const finalY = doc.lastAutoTable.finalY || 68;
     const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
@@ -283,13 +285,13 @@ export default function AdminDashboard() {
       autoTable(doc, {
         head: [tableColumn],
         body: tableRows,
-        startY: 65,
+        startY: 68,
         theme: 'grid',
-        styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
-        headStyles: { fillColor: [79, 70, 229] }, // Indigo
+        styles: { fontSize: 9, cellPadding: 3, valign: 'middle', textColor: [0, 0, 0] },
+        headStyles: { fillColor: [200, 200, 200], textColor: [0, 0, 0] },
       });
 
-      const finalY = doc.lastAutoTable.finalY || 65;
+      const finalY = doc.lastAutoTable.finalY || 68;
       const pageWidth = doc.internal.pageSize.getWidth();
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
