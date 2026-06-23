@@ -9,7 +9,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
     member1Name: '',
     member1Roll: '',
-    title: 'How AI technology used comupter known people or computer unknown people',
+    title: 'How AI technology used comupter known people VS computer unknown people',
     pptUrl: '',
   });
   const [errors, setErrors] = useState({});
@@ -28,7 +28,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
         newErrors.pptUrl = 'Must be a valid URL';
       }
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -43,7 +43,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
       await runTransaction(db, async (transaction) => {
         const counterRef = doc(db, 'counters', 'teams');
         const counterDoc = await transaction.get(counterRef);
-        
+
         if (!counterDoc.exists()) {
           transaction.set(counterRef, { count: 1 });
           newTeamNumber = 1;
@@ -87,7 +87,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
         className="bg-slate-900 border border-slate-700 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl relative custom-scrollbar"
       >
         <div className="sticky top-0 left-0 w-full h-2 bg-gradient-to-r from-cyan-400 to-indigo-500 z-20" />
-        
+
         <div className="sticky top-2 right-0 flex justify-end px-4 md:px-6 pt-4 z-20 pointer-events-none">
           <button
             onClick={onClose}
@@ -113,7 +113,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
                     type="text"
                     className="input-field"
                     value={formData.member1Name}
-                    onChange={(e) => setFormData({...formData, member1Name: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, member1Name: e.target.value })}
                     disabled={isSubmitting}
                   />
                   {errors.member1Name && <p className="text-red-400 text-xs mt-1">{errors.member1Name}</p>}
@@ -124,7 +124,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
                     type="text"
                     className="input-field"
                     value={formData.member1Roll}
-                    onChange={(e) => setFormData({...formData, member1Roll: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, member1Roll: e.target.value })}
                     disabled={isSubmitting}
                   />
                 </div>
@@ -155,7 +155,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
                     className="input-field pl-12"
                     placeholder="https://"
                     value={formData.pptUrl}
-                    onChange={(e) => setFormData({...formData, pptUrl: e.target.value})}
+                    onChange={(e) => setFormData({ ...formData, pptUrl: e.target.value })}
                     disabled={isSubmitting}
                   />
                 </div>
