@@ -90,23 +90,40 @@ export default function AdminDashboard() {
     
     // College Name
     doc.setFontSize(16);
+    doc.setFont("helvetica", "bold");
     doc.setTextColor(14, 165, 233); // cyan
-    doc.text('Ayya Nadar Janaki Ammal College, Sivakasi', pageWidth / 2, 15, { align: 'center' });
+    doc.text('AYYA NADAR JANAKI AMMAL COLLEGE', pageWidth / 2, 15, { align: 'center' });
+    
+    // Accreditations (Smaller text)
+    doc.setFontSize(8);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(100, 116, 139); // slate
+    const accText1 = "(Autonomous, Re-accredited with 'A+' Grade by NAAC (4th Cycle with CGPA of 3.48 out of 4), College of";
+    const accText2 = "Excellence and Mentor institution by UGC, STAR College by DBT, Ranked 63rd at National Level in NIRF 2024";
+    const accText3 = "and DST-FIST (2023) Supported & An ISO 9001:2015 Certified Institution)";
+    doc.text(accText1, pageWidth / 2, 20, { align: 'center' });
+    doc.text(accText2, pageWidth / 2, 24, { align: 'center' });
+    doc.text(accText3, pageWidth / 2, 28, { align: 'center' });
+    
+    // Location
+    doc.setFontSize(10);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(100, 116, 139); // slate
+    doc.text('SIVAKASI - 626 124.', pageWidth / 2, 33, { align: 'center' });
     
     // Department Name
-    doc.setFontSize(11);
-    doc.setTextColor(100, 116, 139); // slate
-    doc.text('Soft Tech Association — Department of Computer Applications', pageWidth / 2, 22, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('SOFTECH - DEPARTMENT OF COMPUTER APPLICATIONS', pageWidth / 2, 40, { align: 'center' });
     
     // Event Name
-    doc.setFontSize(22);
+    doc.setFontSize(18);
     doc.setTextColor(168, 85, 247); // purple
-    doc.text('PPT Presentation Event', pageWidth / 2, 32, { align: 'center' });
+    doc.text('PPT Presentation Event', pageWidth / 2, 48, { align: 'center' });
     
     // Document Title
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 0); // black
-    doc.text(title, pageWidth / 2, 42, { align: 'center' });
+    doc.text(title, pageWidth / 2, 56, { align: 'center' });
   };
 
   const downloadScoreSheet = () => {
@@ -135,13 +152,13 @@ export default function AdminDashboard() {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 50,
+      startY: 65,
       theme: 'grid',
       styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
       headStyles: { fillColor: [14, 165, 233] },
     });
 
-    const finalY = doc.lastAutoTable.finalY || 50;
+    const finalY = doc.lastAutoTable.finalY || 65;
     const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
@@ -184,13 +201,13 @@ export default function AdminDashboard() {
     autoTable(doc, {
       head: [tableColumn],
       body: tableRows,
-      startY: 50,
+      startY: 65,
       theme: 'grid',
       styles: { fontSize: 10, cellPadding: 4, valign: 'middle' },
       headStyles: { fillColor: [168, 85, 247] },
     });
 
-    const finalY = doc.lastAutoTable.finalY || 50;
+    const finalY = doc.lastAutoTable.finalY || 65;
     const pageWidth = doc.internal.pageSize.getWidth();
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
@@ -244,13 +261,13 @@ export default function AdminDashboard() {
         autoTable(doc, {
             head: [tableColumn],
             body: tableRows,
-            startY: 50,
+            startY: 65,
             theme: 'grid',
             styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
             headStyles: { fillColor: [79, 70, 229] }, // Indigo
         });
         
-        const finalY = doc.lastAutoTable.finalY || 50;
+        const finalY = doc.lastAutoTable.finalY || 65;
         const pageWidth = doc.internal.pageSize.getWidth();
         doc.setFontSize(12);
         doc.setTextColor(0, 0, 0);
