@@ -96,16 +96,19 @@ export default function AdminDashboard() {
 
   const addHeader = async (doc, title) => {
     const pageWidth = doc.internal.pageSize.getWidth();
-    
+
     const collegeLogo = await loadLogo('/college-logo.png');
     const deptLogo = await loadLogo('/dept-logo.png');
-    
+
     if (collegeLogo) {
       doc.addImage(collegeLogo, 'PNG', 15, 12, 22, 22);
     }
     if (deptLogo) {
       doc.addImage(deptLogo, 'PNG', pageWidth - 37, 12, 22, 22);
     }
+
+    doc.setFontSize(16);
+    doc.text('SOFTECH \nDEPARTMENT OF COMPUTER APPLICATIONS', pageWidth / 2, 40, { align: 'center' });
 
     // College Name
     doc.setFontSize(16);
@@ -131,8 +134,6 @@ export default function AdminDashboard() {
     doc.text('SIVAKASI - 626 124.', pageWidth / 2, 33, { align: 'center' });
 
     // Department Name
-    doc.setFontSize(12);
-    doc.text('SOFTECH - DEPARTMENT OF COMPUTER APPLICATIONS', pageWidth / 2, 40, { align: 'center' });
 
     // Event Name
     doc.setFontSize(18);
@@ -148,6 +149,7 @@ export default function AdminDashboard() {
   const downloadScoreSheet = async () => {
     const doc = new jsPDF();
     await addHeader(doc, 'Complete Score Sheet');
+
     const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
     const tableRows = [];
 
@@ -252,7 +254,7 @@ export default function AdminDashboard() {
 
     const doc = new jsPDF();
     const staffEntries = Object.entries(staffMap);
-    
+
     for (let index = 0; index < staffEntries.length; index++) {
       const [uid, email] = staffEntries[index];
       if (index > 0) doc.addPage();
@@ -395,8 +397,8 @@ export default function AdminDashboard() {
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-bold text-cyan-400">Team {team.teamNumber}</h3>
                   <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${team.status === 'completed'
-                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
-                      : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
+                    ? 'bg-green-500/20 text-green-400 border border-green-500/30'
+                    : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
                     }`}>
                     {team.status}
                   </span>
