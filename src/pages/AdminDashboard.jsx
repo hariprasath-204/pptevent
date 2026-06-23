@@ -43,8 +43,8 @@ export default function AdminDashboard() {
     navigate('/admin/login');
   };
 
-  const filteredTeams = teams.filter(team => 
-    team.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filteredTeams = teams.filter(team =>
+    team.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     team.teamNumber.toString().includes(searchTerm)
   );
 
@@ -56,7 +56,7 @@ export default function AdminDashboard() {
     if (!ms) return '-';
     return new Date(ms).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
   };
-  
+
   const formatDuration = (secs) => {
     if (secs === undefined) return '-';
     const m = Math.floor(secs / 60);
@@ -68,7 +68,7 @@ export default function AdminDashboard() {
     if (!evaluations) return { presentation: 0, communication: 0, concept: 0, total: 0 };
     const keys = Object.keys(evaluations);
     if (keys.length === 0) return { presentation: 0, communication: 0, concept: 0, total: 0 };
-    
+
     let p = 0, t = 0, d = 0, tot = 0;
     keys.forEach(k => {
       p += evaluations[k].presentation || 0;
@@ -76,7 +76,7 @@ export default function AdminDashboard() {
       d += evaluations[k].concept || 0;
       tot += evaluations[k].total || 0;
     });
-    
+
     return {
       presentation: (p / keys.length).toFixed(1),
       communication: (t / keys.length).toFixed(1),
@@ -87,13 +87,13 @@ export default function AdminDashboard() {
 
   const addHeader = (doc, title) => {
     const pageWidth = doc.internal.pageSize.getWidth();
-    
+
     // College Name
     doc.setFontSize(16);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(14, 165, 233); // cyan
     doc.text('AYYA NADAR JANAKI AMMAL COLLEGE', pageWidth / 2, 15, { align: 'center' });
-    
+
     // Accreditations (Smaller text)
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
@@ -104,22 +104,22 @@ export default function AdminDashboard() {
     doc.text(accText1, pageWidth / 2, 20, { align: 'center' });
     doc.text(accText2, pageWidth / 2, 24, { align: 'center' });
     doc.text(accText3, pageWidth / 2, 28, { align: 'center' });
-    
+
     // Location
     doc.setFontSize(10);
     doc.setFont("helvetica", "bold");
     doc.setTextColor(100, 116, 139); // slate
     doc.text('SIVAKASI - 626 124.', pageWidth / 2, 33, { align: 'center' });
-    
+
     // Department Name
     doc.setFontSize(12);
     doc.text('SOFTECH - DEPARTMENT OF COMPUTER APPLICATIONS', pageWidth / 2, 40, { align: 'center' });
-    
+
     // Event Name
     doc.setFontSize(18);
     doc.setTextColor(168, 85, 247); // purple
     doc.text('PPT Presentation Event', pageWidth / 2, 48, { align: 'center' });
-    
+
     // Document Title
     doc.setFontSize(14);
     doc.setTextColor(0, 0, 0); // black
@@ -128,8 +128,8 @@ export default function AdminDashboard() {
 
   const downloadScoreSheet = () => {
     const doc = new jsPDF();
-    addHeader(doc, 'Complete Score Sheet');
-    
+
+
     const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
     const tableRows = [];
 
@@ -180,7 +180,7 @@ export default function AdminDashboard() {
 
     const doc = new jsPDF();
     addHeader(doc, 'Top 3 Winners');
-    
+
     const tableColumn = ["Rank", "Team No", "Members", "Roll Nos", "Topic", "Total (50)"];
     const tableRows = [];
 
@@ -220,58 +220,58 @@ export default function AdminDashboard() {
   const downloadIndividualStaffSheets = () => {
     const staffMap = {};
     teams.forEach(team => {
-        if (team.evaluations) {
-            Object.entries(team.evaluations).forEach(([uid, evalData]) => {
-                staffMap[uid] = evalData.staffEmail || uid;
-            });
-        }
+      if (team.evaluations) {
+        Object.entries(team.evaluations).forEach(([uid, evalData]) => {
+          staffMap[uid] = evalData.staffEmail || uid;
+        });
+      }
     });
 
     if (Object.keys(staffMap).length === 0) {
-        toast.error('No staff evaluations found.');
-        return;
+      toast.error('No staff evaluations found.');
+      return;
     }
 
     const doc = new jsPDF();
-    
-    Object.entries(staffMap).forEach(([uid, email], index) => {
-        if (index > 0) doc.addPage();
-        
-        addHeader(doc, `Staff Evaluation Sheet - Evaluator: ${email}`);
-        
-        const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
-        const tableRows = [];
-        
-        const sortedTeams = [...teams].sort((a, b) => a.teamNumber - b.teamNumber);
-        sortedTeams.forEach(team => {
-            const ev = team.evaluations?.[uid];
-            if (!ev) return; // Only show teams evaluated by this staff member, or show all? Let's show all so it's a complete sheet. Wait, maybe show all.
-            const members = `${team.member1Name}\n${team.member2Name}`;
-            tableRows.push([
-                team.teamNumber,
-                members,
-                team.title,
-                ev.presentation ?? '-',
-                ev.communication ?? '-',
-                ev.concept ?? '-',
-                ev.total ?? '-'
-            ]);
-        });
 
-        autoTable(doc, {
-            head: [tableColumn],
-            body: tableRows,
-            startY: 65,
-            theme: 'grid',
-            styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
-            headStyles: { fillColor: [79, 70, 229] }, // Indigo
-        });
-        
-        const finalY = doc.lastAutoTable.finalY || 65;
-        const pageWidth = doc.internal.pageSize.getWidth();
-        doc.setFontSize(12);
-        doc.setTextColor(0, 0, 0);
-        doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
+    Object.entries(staffMap).forEach(([uid, email], index) => {
+      if (index > 0) doc.addPage();
+
+      addHeader(doc, `Staff Evaluation Sheet - Evaluator: ${email}`);
+
+      const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
+      const tableRows = [];
+
+      const sortedTeams = [...teams].sort((a, b) => a.teamNumber - b.teamNumber);
+      sortedTeams.forEach(team => {
+        const ev = team.evaluations?.[uid];
+        if (!ev) return; // Only show teams evaluated by this staff member, or show all? Let's show all so it's a complete sheet. Wait, maybe show all.
+        const members = `${team.member1Name}\n${team.member2Name}`;
+        tableRows.push([
+          team.teamNumber,
+          members,
+          team.title,
+          ev.presentation ?? '-',
+          ev.communication ?? '-',
+          ev.concept ?? '-',
+          ev.total ?? '-'
+        ]);
+      });
+
+      autoTable(doc, {
+        head: [tableColumn],
+        body: tableRows,
+        startY: 65,
+        theme: 'grid',
+        styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
+        headStyles: { fillColor: [79, 70, 229] }, // Indigo
+      });
+
+      const finalY = doc.lastAutoTable.finalY || 65;
+      const pageWidth = doc.internal.pageSize.getWidth();
+      doc.setFontSize(12);
+      doc.setTextColor(0, 0, 0);
+      doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
     });
 
     doc.save('Individual_Staff_ScoreSheets.pdf');
@@ -284,7 +284,7 @@ export default function AdminDashboard() {
       <nav className="bg-slate-800 border-b border-slate-700 px-6 py-4 sticky top-0 z-40">
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <h1 className="text-2xl font-bold gradient-text">Admin Dashboard</h1>
-          
+
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-3 bg-slate-900 px-4 py-2 rounded-xl border border-slate-700">
               <label className="text-sm text-slate-400 whitespace-nowrap">Timer (min):</label>
@@ -329,28 +329,26 @@ export default function AdminDashboard() {
 
       {/* Main Content */}
       <div className="container mx-auto px-6 mt-8">
-        
+
         {/* Tabs & Search */}
         <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
           <div className="flex bg-slate-800 p-1 rounded-xl">
             <button
               onClick={() => setActiveTab('teams')}
-              className={`px-6 py-2 rounded-lg font-bold transition-colors ${
-                activeTab === 'teams' ? 'bg-cyan-500 text-slate-900 shadow-md' : 'text-slate-400 hover:text-white'
-              }`}
+              className={`px-6 py-2 rounded-lg font-bold transition-colors ${activeTab === 'teams' ? 'bg-cyan-500 text-slate-900 shadow-md' : 'text-slate-400 hover:text-white'
+                }`}
             >
               Registered Teams ({teams.length})
             </button>
             <button
               onClick={() => setActiveTab('leaderboard')}
-              className={`px-6 py-2 rounded-lg font-bold transition-colors ${
-                activeTab === 'leaderboard' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
-              }`}
+              className={`px-6 py-2 rounded-lg font-bold transition-colors ${activeTab === 'leaderboard' ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                }`}
             >
               Leaderboard
             </button>
           </div>
-          
+
           {activeTab === 'teams' && (
             <div className="relative w-full md:w-64">
               <FaSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-500" />
@@ -376,11 +374,10 @@ export default function AdminDashboard() {
               >
                 <div className="flex justify-between items-start mb-4">
                   <h3 className="text-xl font-bold text-cyan-400">Team {team.teamNumber}</h3>
-                  <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                    team.status === 'completed' 
-                      ? 'bg-green-500/20 text-green-400 border border-green-500/30' 
+                  <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${team.status === 'completed'
+                      ? 'bg-green-500/20 text-green-400 border border-green-500/30'
                       : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'
-                  }`}>
+                    }`}>
                     {team.status}
                   </span>
                 </div>
@@ -410,7 +407,7 @@ export default function AdminDashboard() {
                     <FaDownload />
                     <span>Open Link</span>
                   </a>
-                  
+
                   <button
                     onClick={() => navigate(`/admin/present/${team.teamNumber}`, { state: { team, timerLimit } })}
                     className="flex-1 flex items-center justify-center gap-2 bg-cyan-500 hover:bg-cyan-400 text-slate-900 py-2 rounded-xl transition-colors text-sm font-bold shadow-lg shadow-cyan-500/20"
@@ -429,7 +426,7 @@ export default function AdminDashboard() {
             )}
           </div>
         ) : (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="glass-card overflow-hidden"
