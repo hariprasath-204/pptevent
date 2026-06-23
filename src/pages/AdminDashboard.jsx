@@ -85,8 +85,27 @@ export default function AdminDashboard() {
     };
   };
 
-  const addHeader = (doc, title) => {
+  const loadLogo = (src) => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => resolve(img);
+      img.onerror = () => resolve(null);
+    });
+  };
+
+  const addHeader = async (doc, title) => {
     const pageWidth = doc.internal.pageSize.getWidth();
+    
+    const collegeLogo = await loadLogo('/college-logo.png');
+    const deptLogo = await loadLogo('/dept-logo.png');
+    
+    if (collegeLogo) {
+      doc.addImage(collegeLogo, 'PNG', 15, 10, 25, 30);
+    }
+    if (deptLogo) {
+      doc.addImage(deptLogo, 'PNG', pageWidth - 40, 10, 25, 30);
+    }
 
     // College Name
     doc.setFontSize(16);
@@ -126,10 +145,9 @@ export default function AdminDashboard() {
     doc.text(title, pageWidth / 2, 56, { align: 'center' });
   };
 
-  const downloadScoreSheet = () => {
+  const downloadScoreSheet = async () => {
     const doc = new jsPDF();
-
-
+    await addHeader(doc, 'Complete Score Sheet');
     const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
     const tableRows = [];
 
@@ -168,7 +186,7 @@ export default function AdminDashboard() {
     toast.success('ScoreSheet downloaded');
   };
 
-  const downloadWinnerSheet = () => {
+  const downloadWinnerSheet = async () => {
     const teamsWithAvg = teams.map(t => ({ ...t, avgTotal: parseFloat(getAverages(t.evaluations).total) }));
     const sortedTeams = teamsWithAvg.sort((a, b) => b.avgTotal - a.avgTotal);
     const top3 = sortedTeams.slice(0, 3).filter(t => t.avgTotal > 0);
@@ -179,7 +197,7 @@ export default function AdminDashboard() {
     }
 
     const doc = new jsPDF();
-    addHeader(doc, 'Top 3 Winners');
+    await addHeader(doc, 'Top 3 Winners');
 
     const tableColumn = ["Rank", "Team No", "Members", "Roll Nos", "Topic", "Total (50)"];
     const tableRows = [];
@@ -217,7 +235,7 @@ export default function AdminDashboard() {
     toast.success('WinnerSheet downloaded');
   };
 
-  const downloadIndividualStaffSheets = () => {
+  const downloadIndividualStaffSheets = async () => {
     const staffMap = {};
     teams.forEach(team => {
       if (team.evaluations) {
@@ -233,11 +251,13 @@ export default function AdminDashboard() {
     }
 
     const doc = new jsPDF();
-
-    Object.entries(staffMap).forEach(([uid, email], index) => {
+    const staffEntries = Object.entries(staffMap);
+    
+    for (let index = 0; index < staffEntries.length; index++) {
+      const [uid, email] = staffEntries[index];
       if (index > 0) doc.addPage();
 
-      addHeader(doc, `Staff Evaluation Sheet - Evaluator: ${email}`);
+      await addHeader(doc, `Staff Evaluation Sheet - Evaluator: ${email}`);
 
       const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
       const tableRows = [];
@@ -272,7 +292,7 @@ export default function AdminDashboard() {
       doc.setFontSize(12);
       doc.setTextColor(0, 0, 0);
       doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
-    });
+    }
 
     doc.save('Individual_Staff_ScoreSheets.pdf');
     toast.success('Individual sheets downloaded');
