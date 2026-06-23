@@ -247,48 +247,55 @@ export default function StaffDashboard() {
           </div>
         </div>
 
-        {!isFinished ? (
-          <div className="mt-8 flex justify-end">
-            <button 
-              onClick={() => {
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                setIsFinished(true);
-              }} 
-              className="px-8 py-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white rounded-xl font-bold shadow-lg shadow-pink-500/30 transition-all transform hover:-translate-y-1"
-            >
-              Finish Evaluation
-            </button>
-          </div>
-        ) : (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            className="mt-8 glass-card p-8 rounded-2xl text-center border border-pink-500/30"
+        <div className="mt-8 flex justify-end">
+          <button 
+            onClick={() => setIsFinished(true)} 
+            className="px-8 py-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white rounded-xl font-bold shadow-lg shadow-pink-500/30 transition-all transform hover:-translate-y-1"
           >
-            <h2 className="text-3xl font-bold text-pink-400 mb-4">Thank You!</h2>
-            <p className="text-slate-300 mb-8 max-w-lg mx-auto">
-              Thank you for your valuable time and effort in evaluating the teams. Your expertise is greatly appreciated.
-            </p>
-            
-            <div className="bg-slate-800/50 p-6 rounded-xl inline-block max-w-md w-full">
-              <h3 className="text-xl font-semibold text-cyan-400 mb-4">Upload Your Signature</h3>
-              <p className="text-sm text-slate-400 mb-6">
-                Upload a clear photo of your signature (PNG or JPG) to be automatically added to the final score sheets.
+            Finish Evaluation
+          </button>
+        </div>
+
+        {/* Modal Popup for Finished State */}
+        {isFinished && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              className="bg-slate-900 border border-pink-500/30 p-8 rounded-2xl text-center shadow-2xl max-w-lg w-full relative"
+            >
+              <button 
+                onClick={() => setIsFinished(false)}
+                className="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors"
+              >
+                ✕
+              </button>
+              
+              <h2 className="text-3xl font-bold text-pink-400 mb-4">Thank You!</h2>
+              <p className="text-slate-300 mb-8 max-w-lg mx-auto">
+                Thank you for your valuable time and effort in evaluating the teams. Your expertise is greatly appreciated.
               </p>
               
-              {signature ? (
-                <div className="mb-6">
-                   <img src={signature} alt="Signature" className="h-20 mx-auto bg-white p-2 rounded-lg object-contain" />
-                   <p className="text-green-400 mt-2 text-sm font-semibold">Signature saved successfully!</p>
-                </div>
-              ) : null}
+              <div className="bg-slate-800/50 p-6 rounded-xl inline-block w-full">
+                <h3 className="text-xl font-semibold text-cyan-400 mb-4">Upload Your Signature</h3>
+                <p className="text-sm text-slate-400 mb-6">
+                  Upload a clear photo of your signature (PNG or JPG) to be automatically added to the final score sheets.
+                </p>
+                
+                {signature ? (
+                  <div className="mb-6">
+                     <img src={signature} alt="Signature" className="h-20 mx-auto bg-white p-2 rounded-lg object-contain" />
+                     <p className="text-green-400 mt-2 text-sm font-semibold">Signature saved successfully!</p>
+                  </div>
+                ) : null}
 
-              <label className="relative cursor-pointer inline-flex justify-center items-center gap-2 w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors font-semibold text-white">
-                <span>{signatureUploading ? 'Uploading...' : (signature ? 'Update Signature' : 'Choose File')}</span>
-                <input type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleSignatureUpload} disabled={signatureUploading} />
-              </label>
-            </div>
-          </motion.div>
+                <label className="relative cursor-pointer flex justify-center items-center gap-2 w-full px-6 py-3 bg-indigo-600 hover:bg-indigo-500 rounded-xl transition-colors font-semibold text-white">
+                  <span>{signatureUploading ? 'Uploading...' : (signature ? 'Update Signature' : 'Choose File')}</span>
+                  <input type="file" accept="image/png, image/jpeg" className="hidden" onChange={handleSignatureUpload} disabled={signatureUploading} />
+                </label>
+              </div>
+            </motion.div>
+          </div>
         )}
 
       </div>
