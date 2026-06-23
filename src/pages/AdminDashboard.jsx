@@ -222,7 +222,7 @@ export default function AdminDashboard() {
         
         addHeader(doc, `Staff Evaluation Sheet - Evaluator: ${email}`);
         
-        const tableColumn = ["Team No", "Members", "Topic", "Presentation", "Communication", "Concept", "Total"];
+        const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
         const tableRows = [];
         
         const sortedTeams = [...teams].sort((a, b) => a.teamNumber - b.teamNumber);
