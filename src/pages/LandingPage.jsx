@@ -30,18 +30,18 @@ export default function LandingPage() {
         >
           <h2 className="text-lg md:text-2xl text-cyan-400 font-semibold mb-2">Ayya Nadar Janaki Ammal College, Sivakasi</h2>
           <h3 className="text-base md:text-xl text-slate-300 mb-8">Soft Tech Association — Department of Computer Applications</h3>
-          
+
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
             <span className="gradient-text">PPT Presentation Event</span>
           </h1>
-          
+
           <p className="text-lg md:text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
             Showcase your ideas. Present with confidence. Join us for a day of innovation and learning.
           </p>
 
           <div className="inline-block glass-card px-4 md:px-6 py-2 md:py-3 mb-10 border-cyan-500/30">
             <span className="text-cyan-300 font-medium tracking-wider uppercase text-xs md:text-sm">
-              🗓️ Thursday, 25th June 2026
+              🗓️ Thursday, 2nd June 2026
             </span>
           </div>
 
@@ -89,8 +89,8 @@ export default function LandingPage() {
             <p className="text-slate-400">Watch this quick demo on how to upload your presentation to Google Drive, generate a public link, and register for the event.</p>
           </div>
           <div className="glass-card p-2 md:p-4 rounded-2xl border border-slate-700 overflow-hidden shadow-2xl bg-slate-900/50 relative z-20">
-            <video 
-              controls 
+            <video
+              controls
               playsInline
               webkit-playsinline="true"
               className="w-full rounded-xl"
