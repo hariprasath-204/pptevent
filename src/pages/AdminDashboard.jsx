@@ -150,7 +150,6 @@ export default function AdminDashboard() {
     doc.save('Complete_ScoreSheet.pdf');
     toast.success('ScoreSheet downloaded');
   };
-  };
 
   const downloadWinnerSheet = () => {
     const teamsWithAvg = teams.map(t => ({ ...t, avgTotal: parseFloat(getAverages(t.evaluations).total) }));
