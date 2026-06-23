@@ -101,10 +101,10 @@ export default function AdminDashboard() {
     const deptLogo = await loadLogo('/dept-logo.png');
     
     if (collegeLogo) {
-      doc.addImage(collegeLogo, 'PNG', 15, 10, 25, 30);
+      doc.addImage(collegeLogo, 'PNG', 15, 12, 22, 22);
     }
     if (deptLogo) {
-      doc.addImage(deptLogo, 'PNG', pageWidth - 40, 10, 25, 30);
+      doc.addImage(deptLogo, 'PNG', pageWidth - 37, 12, 22, 22);
     }
 
     // College Name
