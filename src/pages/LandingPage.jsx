@@ -41,7 +41,7 @@ export default function LandingPage() {
 
           <div className="inline-block glass-card px-4 md:px-6 py-2 md:py-3 mb-10 border-cyan-500/30">
             <span className="text-cyan-300 font-medium tracking-wider uppercase text-xs md:text-sm">
-              🗓️ Thursday, 2nd June 2026
+              🗓️ Thursday, 2nd July 2026
             </span>
           </div>
 
