@@ -141,6 +141,12 @@ export default function AdminDashboard() {
       headStyles: { fillColor: [14, 165, 233] },
     });
 
+    const finalY = doc.lastAutoTable.finalY || 50;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
+
     doc.save('Average_ScoreSheet.pdf');
     toast.success('Average ScoreSheet downloaded');
   };
@@ -183,6 +189,12 @@ export default function AdminDashboard() {
       styles: { fontSize: 10, cellPadding: 4, valign: 'middle' },
       headStyles: { fillColor: [168, 85, 247] },
     });
+
+    const finalY = doc.lastAutoTable.finalY || 50;
+    const pageWidth = doc.internal.pageSize.getWidth();
+    doc.setFontSize(12);
+    doc.setTextColor(0, 0, 0);
+    doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
 
     doc.save('WinnerSheet_Top3_Avg.pdf');
     toast.success('WinnerSheet downloaded');
@@ -237,6 +249,12 @@ export default function AdminDashboard() {
             styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
             headStyles: { fillColor: [79, 70, 229] }, // Indigo
         });
+        
+        const finalY = doc.lastAutoTable.finalY || 50;
+        const pageWidth = doc.internal.pageSize.getWidth();
+        doc.setFontSize(12);
+        doc.setTextColor(0, 0, 0);
+        doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
     });
 
     doc.save('Individual_Staff_ScoreSheets.pdf');
