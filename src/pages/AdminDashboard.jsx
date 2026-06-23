@@ -125,9 +125,9 @@ export default function AdminDashboard() {
     // Accreditations (Smaller text)
     doc.setFontSize(8);
     doc.setFont("helvetica", "normal");
-    const accText1 = "(Autonomous, Re-accredited with 'A+' Grade by NAAC (4th Cycle with CGPA of 3.48 out of 4), College of";
-    const accText2 = "Excellence and Mentor institution by UGC, STAR College by DBT, Ranked 63rd at National Level in NIRF 2024";
-    const accText3 = "and DST-FIST (2023) Supported & An ISO 9001:2015 Certified Institution)";
+    const accText1 = "(Autonomous, Affiliated to Madurai Kamaraj University, Madurai, Re-accredited (4th Cycle) with 'A+' Grade";
+    const accText2 = "(CGPA 3.48 out of 4) by NAAC, Recognized as College of Excellence and Mentor Institution by UGC, STAR College by DBT";
+    const accText3 = "and Ranked 72nd at National Level in NIRF 2025 and DST-FIST (2023) Supported & An ISO 9001:2015 & ISO 21001:2018 Certified Institution)";
     doc.text(accText1, pageWidth / 2, 33, { align: 'center' });
     doc.text(accText2, pageWidth / 2, 37, { align: 'center' });
     doc.text(accText3, pageWidth / 2, 41, { align: 'center' });
