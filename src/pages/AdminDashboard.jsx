@@ -210,13 +210,12 @@ export default function AdminDashboard() {
     teams.forEach(t => {
        if (t.evaluations) Object.keys(t.evaluations).forEach(uid => staffUIDs.add(uid));
     });
-    
-    let currentX = 14;
+    let currentX = pageWidth - 44;
     Array.from(staffUIDs).forEach(uid => {
       const sig = usersInfo[uid]?.signature;
       if (sig) {
         doc.addImage(sig, 'PNG', currentX, finalY + 10, 30, 15);
-        currentX += 40;
+        currentX -= 35;
       }
     });
 
@@ -274,13 +273,12 @@ export default function AdminDashboard() {
     teams.forEach(t => {
        if (t.evaluations) Object.keys(t.evaluations).forEach(uid => staffUIDs.add(uid));
     });
-    
-    let currentX = 14;
+    let currentX = pageWidth - 44;
     Array.from(staffUIDs).forEach(uid => {
       const sig = usersInfo[uid]?.signature;
       if (sig) {
         doc.addImage(sig, 'PNG', currentX, finalY + 10, 30, 15);
-        currentX += 40;
+        currentX -= 35;
       }
     });
 
