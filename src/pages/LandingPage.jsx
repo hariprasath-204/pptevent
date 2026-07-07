@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaUserFriends, FaFilePowerpoint, FaClock, FaChalkboardTeacher } from 'react-icons/fa';
+import { doc, onSnapshot } from 'firebase/firestore';
+import { db } from '../firebase';
 import RegistrationModal from '../components/RegistrationModal';
 import SuccessModal from '../components/SuccessModal';
 
@@ -8,6 +10,22 @@ export default function LandingPage() {
   const [isRegModalOpen, setIsRegModalOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successData, setSuccessData] = useState(null);
+  const [eventSettings, setEventSettings] = useState({
+    eventName: 'PPT Presentation Event',
+    eventDate: 'Coming Soon....'
+  });
+
+  useEffect(() => {
+    const unsub = onSnapshot(doc(db, 'settings', 'event'), (docSnap) => {
+      if (docSnap.exists()) {
+        setEventSettings({
+          eventName: docSnap.data().eventName || 'PPT Presentation Event',
+          eventDate: docSnap.data().eventDate || 'Coming Soon....'
+        });
+      }
+    });
+    return () => unsub();
+  }, []);
 
   const handleSuccess = (data) => {
     setIsRegModalOpen(false);
@@ -32,7 +50,7 @@ export default function LandingPage() {
           <h3 className="text-base md:text-xl text-slate-300 mb-8">Soft Tech Association — Department of Computer Applications</h3>
 
           <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
-            <span className="gradient-text">PPT Presentation Event</span>
+            <span className="gradient-text">{eventSettings.eventName}</span>
           </h1>
 
           <p className="text-lg md:text-xl text-slate-400 mb-8 max-w-2xl mx-auto leading-relaxed">
@@ -41,7 +59,7 @@ export default function LandingPage() {
 
           <div className="inline-block glass-card px-4 md:px-6 py-2 md:py-3 mb-10 border-cyan-500/30">
             <span className="text-cyan-300 font-medium tracking-wider uppercase text-xs md:text-sm">
-              🗓️ Thursday, 2nd July 2026
+              🗓️ {eventSettings.eventDate}
             </span>
           </div>
 
@@ -118,6 +136,7 @@ export default function LandingPage() {
         {isSuccessModalOpen && (
           <SuccessModal
             teamData={successData}
+            eventSettings={eventSettings}
             onClose={() => setIsSuccessModalOpen(false)}
           />
         )}

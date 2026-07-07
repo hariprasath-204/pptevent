@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { collection, query, orderBy, onSnapshot, getDocs } from 'firebase/firestore';
+import { collection, query, orderBy, onSnapshot, getDocs, doc, setDoc, getDoc } from 'firebase/firestore';
 import { signOut } from 'firebase/auth';
 import { auth, db } from '../firebase';
 import { useNavigate } from 'react-router-dom';
@@ -19,6 +19,11 @@ export default function AdminDashboard() {
   const navigate = useNavigate();
 
   const [activeTab, setActiveTab] = useState('teams');
+  const [eventSettings, setEventSettings] = useState({
+    eventName: 'PPT Presentation Event',
+    eventDate: 'Coming Soon....'
+  });
+  const [savingSettings, setSavingSettings] = useState(false);
 
   const [usersInfo, setUsersInfo] = useState({});
 
@@ -32,9 +37,21 @@ export default function AdminDashboard() {
       setTeams(teamsData);
     });
 
+    const unsubSettings = onSnapshot(doc(db, 'settings', 'event'), (docSnap) => {
+      if (docSnap.exists()) {
+        setEventSettings({
+          eventName: docSnap.data().eventName || 'PPT Presentation Event',
+          eventDate: docSnap.data().eventDate || 'Coming Soon....'
+        });
+      }
+    });
+
     fetchUsersInfo();
 
-    return () => unsubscribe();
+    return () => {
+      unsubscribe();
+      unsubSettings();
+    };
   }, []);
 
   const fetchUsersInfo = async () => {
@@ -54,6 +71,23 @@ export default function AdminDashboard() {
     const val = parseInt(e.target.value) || 1;
     setTimerLimit(val);
     localStorage.setItem('timerLimit', val.toString());
+  };
+
+  const handleSaveSettings = async (e) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      await setDoc(doc(db, 'settings', 'event'), {
+        eventName: eventSettings.eventName.trim() || 'PPT Presentation Event',
+        eventDate: eventSettings.eventDate.trim() || 'Coming Soon....'
+      }, { merge: true });
+      toast.success('Event settings updated successfully!');
+    } catch (err) {
+      console.error(err);
+      toast.error('Failed to update event settings.');
+    } finally {
+      setSavingSettings(false);
+    }
   };
 
   const handleLogout = async () => {
@@ -167,7 +201,7 @@ export default function AdminDashboard() {
 
     // Event Name
     doc.setFontSize(18);
-    doc.text('PPT Presentation Event', pageWidth / 2, 57, { align: 'center' });
+    doc.text(eventSettings.eventName || 'PPT Presentation Event', pageWidth / 2, 57, { align: 'center' });
 
     // Document Title (Optional)
     if (title) {
@@ -463,6 +497,13 @@ export default function AdminDashboard() {
             >
               Leaderboard
             </button>
+            <button
+              onClick={() => setActiveTab('settings')}
+              className={`px-6 py-2 rounded-lg font-bold transition-colors ${activeTab === 'settings' ? 'bg-pink-500 text-white shadow-md' : 'text-slate-400 hover:text-white'
+                }`}
+            >
+              ⚙️ Event Settings
+            </button>
           </div>
 
           {activeTab === 'teams' && (
@@ -588,6 +629,49 @@ export default function AdminDashboard() {
                 </tbody>
               </table>
             </div>
+          </motion.div>
+        )}
+
+        {activeTab === 'settings' && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="glass-card max-w-2xl mx-auto p-8 border border-slate-700"
+          >
+            <h2 className="text-2xl font-bold text-cyan-400 mb-2">Manage Event Details</h2>
+            <p className="text-slate-400 mb-6">Update the event name and display date shown on the landing page and reports.</p>
+            <form onSubmit={handleSaveSettings} className="space-y-6">
+              <div>
+                <label className="block text-sm text-slate-400 mb-2">Event Name</label>
+                <input
+                  type="text"
+                  className="input-field"
+                  value={eventSettings.eventName}
+                  onChange={(e) => setEventSettings({ ...eventSettings, eventName: e.target.value })}
+                  placeholder="PPT Presentation Event"
+                  required
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-slate-400 mb-2">Date of Event</label>
+                <input
+                  type="text"
+                  className="input-field"
+                  value={eventSettings.eventDate}
+                  onChange={(e) => setEventSettings({ ...eventSettings, eventDate: e.target.value })}
+                  placeholder="Coming Soon...."
+                  required
+                />
+                <p className="text-xs text-slate-500 mt-2">Example: "Coming Soon...." or "Thursday, 2nd July 2026"</p>
+              </div>
+              <button
+                type="submit"
+                disabled={savingSettings}
+                className="btn-primary w-full py-3 text-lg font-bold shadow-lg shadow-pink-500/20 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400"
+              >
+                {savingSettings ? 'Saving...' : 'Save Settings'}
+              </button>
+            </form>
           </motion.div>
         )}
       </div>

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { FaCheckCircle } from 'react-icons/fa';
 
-export default function SuccessModal({ teamData, onClose }) {
+export default function SuccessModal({ teamData, eventSettings, onClose }) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -31,8 +31,8 @@ export default function SuccessModal({ teamData, onClose }) {
           Thank you for registering, <span className="font-bold text-cyan-400">Team {teamData?.teamNumber}</span>!
         </p>
         <p className="text-slate-400 mb-8">
-          The event will begin on Thursday, 25th June 2026.<br />
-          Welcome to Soft Tech Association's PPT Presentation Event!
+          The event will begin on <span className="text-white font-semibold">{eventSettings?.eventDate || 'Coming Soon....'}</span>.<br />
+          Welcome to Soft Tech Association's <span className="text-cyan-400 font-semibold">{eventSettings?.eventName || 'PPT Presentation Event'}</span>!
         </p>
 
         <button
