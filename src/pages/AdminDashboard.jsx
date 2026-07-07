@@ -520,7 +520,7 @@ export default function AdminDashboard() {
           )}
         </div>
 
-        {activeTab === 'teams' ? (
+        {activeTab === 'teams' && (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
             {filteredTeams.map((team) => (
               <motion.div
@@ -581,7 +581,9 @@ export default function AdminDashboard() {
               </div>
             )}
           </div>
-        ) : (
+        )}
+
+        {activeTab === 'leaderboard' && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
