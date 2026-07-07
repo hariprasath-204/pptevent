@@ -7,6 +7,7 @@ import toast from 'react-hot-toast';
 
 export default function RegistrationModal({ onClose, onSuccess }) {
   const [formData, setFormData] = useState({
+    category: 'UG',
     member1Name: '',
     member1Roll: '',
     title: 'How AI technology used comupter known people VS computer unknown people',
@@ -18,6 +19,9 @@ export default function RegistrationModal({ onClose, onSuccess }) {
   const validate = () => {
     const newErrors = {};
     if (!formData.member1Name.trim()) newErrors.member1Name = 'Required';
+    if (formData.category === 'UG' && !formData.member1Roll.trim()) {
+      newErrors.member1Roll = 'Required for UG students';
+    }
     if (!formData.title.trim()) newErrors.title = 'Required';
     if (!formData.pptUrl.trim()) {
       newErrors.pptUrl = 'Required';
@@ -55,6 +59,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
         const teamRef = doc(db, 'teams', `team_${newTeamNumber}`);
         transaction.set(teamRef, {
           teamNumber: newTeamNumber,
+          category: formData.category || 'UG',
           member1Name: formData.member1Name.trim(),
           member1Roll: formData.member1Roll.trim() || null,
           title: formData.title.trim(),
@@ -108,6 +113,18 @@ export default function RegistrationModal({ onClose, onSuccess }) {
               <div className="space-y-4">
                 <h3 className="text-lg font-semibold text-cyan-400 border-b border-slate-800 pb-2">Participant Details</h3>
                 <div>
+                  <label className="block text-sm text-slate-400 mb-1">Category (UG / PG) *</label>
+                  <select
+                    className="input-field bg-slate-800 font-semibold text-cyan-400"
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    disabled={isSubmitting}
+                  >
+                    <option value="UG">UG (Undergraduate)</option>
+                    <option value="PG">PG (Postgraduate)</option>
+                  </select>
+                </div>
+                <div>
                   <label className="block text-sm text-slate-400 mb-1">Name *</label>
                   <input
                     type="text"
@@ -119,7 +136,9 @@ export default function RegistrationModal({ onClose, onSuccess }) {
                   {errors.member1Name && <p className="text-red-400 text-xs mt-1">{errors.member1Name}</p>}
                 </div>
                 <div>
-                  <label className="block text-sm text-slate-400 mb-1">Roll Number (Optional)</label>
+                  <label className="block text-sm text-slate-400 mb-1">
+                    {formData.category === 'UG' ? 'Roll Number *' : 'Roll Number (Optional)'}
+                  </label>
                   <input
                     type="text"
                     className="input-field"
@@ -127,6 +146,7 @@ export default function RegistrationModal({ onClose, onSuccess }) {
                     onChange={(e) => setFormData({ ...formData, member1Roll: e.target.value })}
                     disabled={isSubmitting}
                   />
+                  {errors.member1Roll && <p className="text-red-400 text-xs mt-1">{errors.member1Roll}</p>}
                 </div>
               </div>
             </div>

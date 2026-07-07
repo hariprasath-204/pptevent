@@ -3,7 +3,7 @@ import { db } from '../firebase';
 import { collection, query, getDocs, doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 import { auth } from '../firebase';
 import { signOut } from 'firebase/auth';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion } from 'framer-motion';
 
@@ -14,6 +14,10 @@ export default function StaffDashboard() {
   const [signatureUploading, setSignatureUploading] = useState(false);
   const [signature, setSignature] = useState(null);
   const navigate = useNavigate();
+  const location = useLocation();
+  const [selectedCategory, setSelectedCategory] = useState(
+    location.state?.category || localStorage.getItem('staffCategory') || 'UG'
+  );
 
   useEffect(() => {
     fetchTeams();
@@ -165,7 +169,22 @@ export default function StaffDashboard() {
             <h1 className="text-3xl font-bold gradient-text">Staff Evaluation Dashboard</h1>
             <p className="text-slate-400 mt-2">Evaluate teams and generate score sheets</p>
           </div>
-          <div className="flex flex-wrap gap-4">
+          <div className="flex flex-wrap items-center gap-4">
+            <div className="flex items-center gap-2 bg-slate-800 px-3 py-2 rounded-xl border border-slate-700">
+              <label className="text-sm text-slate-400 whitespace-nowrap">Category:</label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => {
+                  setSelectedCategory(e.target.value);
+                  localStorage.setItem('staffCategory', e.target.value);
+                }}
+                className="bg-transparent text-cyan-400 font-bold outline-none border-b border-slate-600 focus:border-cyan-400 text-center cursor-pointer"
+              >
+                <option value="UG" className="bg-slate-900 text-white">UG</option>
+                <option value="PG" className="bg-slate-900 text-white">PG</option>
+                <option value="All" className="bg-slate-900 text-white">All</option>
+              </select>
+            </div>
             <button onClick={handleLogout} className="px-4 py-2 bg-slate-800 hover:bg-slate-700 rounded-xl transition-colors border border-slate-700 text-sm">
               Logout
             </button>
@@ -178,7 +197,7 @@ export default function StaffDashboard() {
               <thead>
                 <tr className="bg-slate-800/50 border-b border-slate-700">
                   <th className="p-4 font-semibold text-cyan-400">Team No</th>
-                  <th className="p-4 font-semibold text-cyan-400">Members & Topic</th>
+                  <th className="p-4 font-semibold text-cyan-400">Participant & Topic</th>
                   <th className="p-4 font-semibold text-indigo-400 text-center">Presentation (20)</th>
                   <th className="p-4 font-semibold text-indigo-400 text-center">Communication (20)</th>
                   <th className="p-4 font-semibold text-indigo-400 text-center">Concept (10)</th>
@@ -187,12 +206,19 @@ export default function StaffDashboard() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-800">
-                {teams.map((team) => (
+                {teams
+                  .filter(team => {
+                    if (selectedCategory === 'All') return true;
+                    return (team.category || 'UG') === selectedCategory;
+                  })
+                  .map((team) => (
                   <tr key={team.id} className="hover:bg-slate-800/30 transition-colors">
                     <td className="p-4 whitespace-nowrap font-bold">Team {team.teamNumber}</td>
                     <td className="p-4">
-                      <div className="font-semibold">{team.member1Name} <span className="text-slate-500 text-sm">({team.member1Roll || 'N/A'})</span></div>
-                      <div className="font-semibold mt-1">{team.member2Name} <span className="text-slate-500 text-sm">({team.member2Roll || 'N/A'})</span></div>
+                      <div className="flex items-center gap-2">
+                        <div className="font-semibold">{team.member1Name} <span className="text-slate-500 text-sm">({team.member1Roll || 'N/A'})</span></div>
+                        <span className="text-xs bg-slate-800 text-cyan-400 px-2 py-0.5 rounded font-bold uppercase">{team.category || 'UG'}</span>
+                      </div>
                       <div className="text-sm text-cyan-300 mt-2 truncate max-w-[200px]" title={team.title}>Topic: {team.title}</div>
                     </td>
                     <td className="p-4 text-center">
@@ -235,10 +261,10 @@ export default function StaffDashboard() {
                     </td>
                   </tr>
                 ))}
-                {teams.length === 0 && (
+                {teams.filter(team => selectedCategory === 'All' ? true : (team.category || 'UG') === selectedCategory).length === 0 && (
                   <tr>
                     <td colSpan="7" className="p-8 text-center text-slate-500">
-                      No teams registered yet.
+                      No {selectedCategory === 'All' ? '' : selectedCategory} teams registered yet.
                     </td>
                   </tr>
                 )}

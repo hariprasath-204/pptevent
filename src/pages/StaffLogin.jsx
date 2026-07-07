@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 export default function StaffLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('UG');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -16,8 +17,9 @@ export default function StaffLogin() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
+      localStorage.setItem('staffCategory', selectedCategory);
       toast.success('Staff Login successful');
-      navigate('/staff/dashboard');
+      navigate('/staff/dashboard', { state: { category: selectedCategory } });
     } catch (error) {
       toast.error('Invalid email or password');
       console.error(error);
@@ -59,6 +61,19 @@ export default function StaffLogin() {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </div>
+
+          <div>
+            <label className="block text-sm text-slate-400 mb-1">Evaluate Category</label>
+            <select
+              className="input-field bg-slate-800 text-cyan-400 font-semibold"
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+            >
+              <option value="UG">UG (Undergraduate)</option>
+              <option value="PG">PG (Postgraduate)</option>
+              <option value="All">All Teams</option>
+            </select>
           </div>
 
           <button

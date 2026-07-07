@@ -14,6 +14,7 @@ export default function AdminDashboard() {
   const [timerLimit, setTimerLimit] = useState(
     parseInt(localStorage.getItem('timerLimit')) || 3
   );
+  const [selectedCategory, setSelectedCategory] = useState('UG');
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
@@ -60,12 +61,18 @@ export default function AdminDashboard() {
     navigate('/admin/login');
   };
 
-  const filteredTeams = teams.filter(team =>
+  const categoryTeams = teams.filter(team => {
+    if (selectedCategory === 'All') return true;
+    const cat = team.category || 'UG';
+    return cat === selectedCategory;
+  });
+
+  const filteredTeams = categoryTeams.filter(team =>
     team.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
     team.teamNumber.toString().includes(searchTerm)
   );
 
-  const completedTeams = teams
+  const completedTeams = categoryTeams
     .filter(t => t.status === 'completed' && t.durationSeconds !== undefined)
     .sort((a, b) => a.durationSeconds - b.durationSeconds); // Sort fastest first
 
@@ -171,15 +178,21 @@ export default function AdminDashboard() {
 
   const downloadScoreSheet = async () => {
     const doc = new jsPDF();
-    await addHeader(doc, ''); // Remove title completely
+    const titleText = selectedCategory === 'All' ? '' : `${selectedCategory} ScoreSheet`;
+    await addHeader(doc, titleText);
 
-    const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
+    const tableColumn = ["Team No", "Participant", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
     const tableRows = [];
 
-    const sortedTeams = [...teams].sort((a, b) => a.teamNumber - b.teamNumber);
+    const targetTeams = teams.filter(team => {
+      if (selectedCategory === 'All') return true;
+      return (team.category || 'UG') === selectedCategory;
+    });
+
+    const sortedTeams = [...targetTeams].sort((a, b) => a.teamNumber - b.teamNumber);
     sortedTeams.forEach(team => {
       const avg = getAverages(team.evaluations);
-      const members = `${team.member1Name} (${team.member1Roll || 'N/A'})\n${team.member2Name} (${team.member2Roll || 'N/A'})`;
+      const members = `${team.member1Name} (${team.member1Roll || 'N/A'})`;
       const rowData = [
         team.teamNumber,
         members,
@@ -221,12 +234,16 @@ export default function AdminDashboard() {
 
     doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
 
-    doc.save('Complete_ScoreSheet.pdf');
+    doc.save(`${selectedCategory}_ScoreSheet.pdf`);
     toast.success('ScoreSheet downloaded');
   };
 
   const downloadWinnerSheet = async () => {
-    const teamsWithAvg = teams.map(t => ({ ...t, avgTotal: parseFloat(getAverages(t.evaluations).total) }));
+    const targetTeams = teams.filter(team => {
+      if (selectedCategory === 'All') return true;
+      return (team.category || 'UG') === selectedCategory;
+    });
+    const teamsWithAvg = targetTeams.map(t => ({ ...t, avgTotal: parseFloat(getAverages(t.evaluations).total) }));
     const sortedTeams = teamsWithAvg.sort((a, b) => b.avgTotal - a.avgTotal);
     const top3 = sortedTeams.slice(0, 3).filter(t => t.avgTotal > 0);
 
@@ -236,14 +253,15 @@ export default function AdminDashboard() {
     }
 
     const doc = new jsPDF();
-    await addHeader(doc, 'Top 3 Winners');
+    const titleText = selectedCategory === 'All' ? 'Top 3 Winners' : `Top 3 Winners (${selectedCategory})`;
+    await addHeader(doc, titleText);
 
-    const tableColumn = ["Rank", "Team No", "Members", "Roll Nos", "Topic", "Total (50)"];
+    const tableColumn = ["Rank", "Team No", "Participant", "Roll No", "Topic", "Total (50)"];
     const tableRows = [];
 
     top3.forEach((team, index) => {
-      const members = `${team.member1Name}\n${team.member2Name}`;
-      const rolls = `${team.member1Roll || 'N/A'}\n${team.member2Roll || 'N/A'}`;
+      const members = team.member1Name;
+      const rolls = team.member1Roll || 'N/A';
       const rowData = [
         index + 1,
         team.teamNumber,
@@ -284,13 +302,18 @@ export default function AdminDashboard() {
 
     doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
 
-    doc.save('WinnerSheet_Top3.pdf');
+    doc.save(`WinnerSheet_Top3_${selectedCategory}.pdf`);
     toast.success('WinnerSheet downloaded');
   };
 
   const downloadIndividualStaffSheets = async () => {
+    const targetTeams = teams.filter(team => {
+      if (selectedCategory === 'All') return true;
+      return (team.category || 'UG') === selectedCategory;
+    });
+
     const staffMap = {};
-    teams.forEach(team => {
+    targetTeams.forEach(team => {
       if (team.evaluations) {
         Object.entries(team.evaluations).forEach(([uid, evalData]) => {
           staffMap[uid] = evalData.staffEmail || uid;
@@ -310,16 +333,17 @@ export default function AdminDashboard() {
       const [uid, email] = staffEntries[index];
       if (index > 0) doc.addPage();
 
-      await addHeader(doc, `Staff Evaluation Sheet - Evaluator: ${email}`);
+      const catText = selectedCategory === 'All' ? '' : ` (${selectedCategory})`;
+      await addHeader(doc, `Staff Evaluation Sheet${catText} - Evaluator: ${email}`);
 
-      const tableColumn = ["Team No", "Members", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
+      const tableColumn = ["Team No", "Participant", "Topic", "Presentation (20)", "Communication (20)", "Concept (10)", "Total (50)"];
       const tableRows = [];
 
-      const sortedTeams = [...teams].sort((a, b) => a.teamNumber - b.teamNumber);
+      const sortedTeams = [...targetTeams].sort((a, b) => a.teamNumber - b.teamNumber);
       sortedTeams.forEach(team => {
         const ev = team.evaluations?.[uid];
-        if (!ev) return; // Only show teams evaluated by this staff member, or show all? Let's show all so it's a complete sheet. Wait, maybe show all.
-        const members = `${team.member1Name}\n${team.member2Name}`;
+        if (!ev) return;
+        const members = `${team.member1Name} (${team.member1Roll || 'N/A'})`;
         tableRows.push([
           team.teamNumber,
           members,
@@ -353,7 +377,7 @@ export default function AdminDashboard() {
       doc.text('Staff Signature', pageWidth - 14, finalY + 30, { align: 'right' });
     }
 
-    doc.save('Individual_Staff_ScoreSheets.pdf');
+    doc.save(`Individual_Staff_ScoreSheets_${selectedCategory}.pdf`);
     toast.success('Individual sheets downloaded');
   };
 
@@ -364,7 +388,20 @@ export default function AdminDashboard() {
         <div className="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <h1 className="text-2xl font-bold gradient-text">Admin Dashboard</h1>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2 bg-slate-900 px-3 py-2 rounded-xl border border-slate-700">
+              <label className="text-sm text-slate-400 whitespace-nowrap">Category:</label>
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="bg-transparent text-cyan-400 font-bold outline-none border-b border-slate-600 focus:border-cyan-400 text-center cursor-pointer"
+              >
+                <option value="UG" className="bg-slate-900 text-white">UG</option>
+                <option value="PG" className="bg-slate-900 text-white">PG</option>
+                <option value="All" className="bg-slate-900 text-white">All</option>
+              </select>
+            </div>
+
             <div className="flex items-center gap-3 bg-slate-900 px-4 py-2 rounded-xl border border-slate-700">
               <label className="text-sm text-slate-400 whitespace-nowrap">Timer (min):</label>
               <input
@@ -417,7 +454,7 @@ export default function AdminDashboard() {
               className={`px-6 py-2 rounded-lg font-bold transition-colors ${activeTab === 'teams' ? 'bg-cyan-500 text-slate-900 shadow-md' : 'text-slate-400 hover:text-white'
                 }`}
             >
-              Registered Teams ({teams.length})
+              Registered Teams ({categoryTeams.length})
             </button>
             <button
               onClick={() => setActiveTab('leaderboard')}
@@ -467,12 +504,11 @@ export default function AdminDashboard() {
 
                 <div className="space-y-2 mb-6 flex-grow">
                   <div className="bg-slate-800/50 p-3 rounded-lg">
-                    <p className="font-semibold text-slate-200">{team.member1Name}</p>
-                    {team.member1Roll && <p className="text-sm text-slate-500">Roll: {team.member1Roll}</p>}
-                  </div>
-                  <div className="bg-slate-800/50 p-3 rounded-lg">
-                    <p className="font-semibold text-slate-200">{team.member2Name}</p>
-                    {team.member2Roll && <p className="text-sm text-slate-500">Roll: {team.member2Roll}</p>}
+                    <div className="flex justify-between items-center">
+                      <p className="font-semibold text-slate-200">{team.member1Name}</p>
+                      <span className="text-xs bg-slate-700 text-cyan-400 px-2 py-0.5 rounded font-bold uppercase">{team.category || 'UG'}</span>
+                    </div>
+                    {team.member1Roll && <p className="text-sm text-slate-500 mt-1">Roll: {team.member1Roll}</p>}
                   </div>
                 </div>
 
@@ -516,7 +552,7 @@ export default function AdminDashboard() {
                   <tr className="bg-slate-800/80 border-b border-slate-700">
                     <th className="p-4 font-semibold text-cyan-400">Rank</th>
                     <th className="p-4 font-semibold text-cyan-400">Team</th>
-                    <th className="p-4 font-semibold text-cyan-400">Members</th>
+                    <th className="p-4 font-semibold text-cyan-400">Participant</th>
                     <th className="p-4 font-semibold text-cyan-400">Title</th>
                     <th className="p-4 font-semibold text-slate-300">Starting Time</th>
                     <th className="p-4 font-semibold text-slate-300">Ending Time</th>
@@ -533,9 +569,7 @@ export default function AdminDashboard() {
                           <div className="font-semibold text-slate-200">
                             {team.member1Name} <span className="text-slate-500 font-normal">{team.member1Roll ? `(${team.member1Roll})` : ''}</span>
                           </div>
-                          <div className="font-semibold text-slate-200 mt-1">
-                            {team.member2Name} <span className="text-slate-500 font-normal">{team.member2Roll ? `(${team.member2Roll})` : ''}</span>
-                          </div>
+                          <span className="text-xs bg-slate-800 text-cyan-400 px-2 py-0.5 rounded font-bold uppercase mt-1 inline-block">{team.category || 'UG'}</span>
                         </div>
                       </td>
                       <td className="p-4 text-slate-300 max-w-[200px] truncate" title={team.title}>{team.title}</td>
