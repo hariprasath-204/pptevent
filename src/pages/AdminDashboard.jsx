@@ -129,10 +129,10 @@ export default function AdminDashboard() {
 
     let p = 0, t = 0, d = 0, tot = 0;
     keys.forEach(k => {
-      p += evaluations[k].presentation || 0;
-      t += evaluations[k].communication || 0;
-      d += evaluations[k].concept || 0;
-      tot += evaluations[k].total || 0;
+      p += parseFloat(evaluations[k].presentation) || 0;
+      t += parseFloat(evaluations[k].communication) || 0;
+      d += parseFloat(evaluations[k].concept) || 0;
+      tot += parseFloat(evaluations[k].total) || 0;
     });
 
     return {

@@ -80,22 +80,24 @@ export default function StaffDashboard() {
   };
 
   const handleMarkChange = (teamId, field, value) => {
-    let numValue = parseInt(value, 10);
-    if (isNaN(numValue)) numValue = '';
-    
-    // Validate maximums
-    if (field === 'presentation' && numValue > 20) numValue = 20;
-    if (field === 'communication' && numValue > 20) numValue = 20;
-    if (field === 'concept' && numValue > 10) numValue = 10;
-    if (numValue !== '' && numValue < 0) numValue = 0;
+    let numValue = value;
+    if (value !== '') {
+      const parsed = parseFloat(value);
+      if (!isNaN(parsed)) {
+        if (field === 'presentation' && parsed > 20) numValue = '20';
+        else if (field === 'communication' && parsed > 20) numValue = '20';
+        else if (field === 'concept' && parsed > 10) numValue = '10';
+        else if (parsed < 0) numValue = '0';
+      }
+    }
 
     setTeams(prevTeams => prevTeams.map(team => {
       if (team.id === teamId) {
         const updatedMarks = { ...team.marks, [field]: numValue };
-        const p = updatedMarks.presentation === '' ? 0 : updatedMarks.presentation;
-        const t = updatedMarks.communication === '' ? 0 : updatedMarks.communication;
-        const d = updatedMarks.concept === '' ? 0 : updatedMarks.concept;
-        const total = p + t + d;
+        const p = parseFloat(updatedMarks.presentation) || 0;
+        const c = parseFloat(updatedMarks.communication) || 0;
+        const d = parseFloat(updatedMarks.concept) || 0;
+        const total = parseFloat((p + c + d).toFixed(2));
 
         return { ...team, marks: updatedMarks, totalMark: total };
       }
@@ -111,14 +113,19 @@ export default function StaffDashboard() {
     }
     
     try {
+      const p = parseFloat(team.marks.presentation) || 0;
+      const c = parseFloat(team.marks.communication) || 0;
+      const d = parseFloat(team.marks.concept) || 0;
+      const total = parseFloat((p + c + d).toFixed(2));
+
       const teamRef = doc(db, 'teams', team.id);
       await updateDoc(teamRef, {
         [`evaluations.${user.uid}`]: {
           staffEmail: user.email || 'staff',
-          presentation: team.marks.presentation,
-          communication: team.marks.communication,
-          concept: team.marks.concept,
-          total: team.totalMark
+          presentation: p,
+          communication: c,
+          concept: d,
+          total: total
         }
       });
       toast.success(`Marks saved for Team ${team.teamNumber}`);
@@ -224,6 +231,7 @@ export default function StaffDashboard() {
                     <td className="p-4 text-center">
                       <input 
                         type="number" 
+                        step="any"
                         min="0" max="20"
                         className="w-16 p-2 bg-slate-900 border border-slate-700 rounded text-center focus:border-indigo-500 focus:outline-none"
                         value={team.marks?.presentation ?? ''}
@@ -233,6 +241,7 @@ export default function StaffDashboard() {
                     <td className="p-4 text-center">
                       <input 
                         type="number" 
+                        step="any"
                         min="0" max="20"
                         className="w-16 p-2 bg-slate-900 border border-slate-700 rounded text-center focus:border-indigo-500 focus:outline-none"
                         value={team.marks?.communication ?? ''}
@@ -242,6 +251,7 @@ export default function StaffDashboard() {
                     <td className="p-4 text-center">
                       <input 
                         type="number" 
+                        step="any"
                         min="0" max="10"
                         className="w-16 p-2 bg-slate-900 border border-slate-700 rounded text-center focus:border-indigo-500 focus:outline-none"
                         value={team.marks?.concept ?? ''}
